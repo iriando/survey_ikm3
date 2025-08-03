@@ -211,43 +211,43 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
     }
 
 
-    // public function table(Table $table): Table
-    // {
-    //     return $table
-    //     ->query(function () {
-    //         $query = RespondenIkm::query()->with('responden');
+    public function table(Table $table): Table
+    {
+        return $table
+        ->query(function () {
+            $query = RespondenIkm::query()->with('responden');
 
-    //         if ($this->tanggalMulai) {
-    //             $query->whereDate('updated_at', '>=', $this->tanggalMulai);
-    //         }
+            if ($this->tanggalMulai) {
+                $query->whereDate('updated_at', '>=', $this->tanggalMulai);
+            }
 
-    //         if ($this->tanggalAkhir) {
-    //             $query->whereDate('updated_at', '<=', $this->tanggalAkhir);
-    //         }
+            if ($this->tanggalAkhir) {
+                $query->whereDate('updated_at', '<=', $this->tanggalAkhir);
+            }
 
-    //         return $query;
-    //     })
-    //     ->columns([
-    //         TextColumn::make('responden.nama')
-    //             ->label('Nama Responden')
-    //             ->sortable()
-    //             ->searchable(),
+            return $query;
+        })
+        ->columns([
+            TextColumn::make('responden.nama')
+                ->label('Nama Responden')
+                ->sortable()
+                ->searchable(),
 
-    //         TextColumn::make('responden.usia')
-    //             ->label('Usia')
-    //             ->sortable(),
+            TextColumn::make('responden.usia')
+                ->label('Usia')
+                ->sortable(),
 
-    //         BadgeColumn::make('responden.gender')
-    //             ->label('Gender')
-    //             ->colors([
-    //                 'success' => 'Laki-laki',
-    //                 'danger' => 'Perempuan',
-    //             ]),
+            BadgeColumn::make('responden.gender')
+                ->label('Gender')
+                ->colors([
+                    'success' => 'Laki-laki',
+                    'danger' => 'Perempuan',
+                ]),
 
-    //         TextColumn::make('kd_unsur')->label('Kode Unsur')->sortable(),
-    //         TextColumn::make('skor')->label('Skor')->sortable(),
-    //         TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
-    //     ])
-    //     ->paginated(10);
-    // }
+            TextColumn::make('kd_unsur')->label('Kode Unsur')->sortable(),
+            TextColumn::make('skor')->label('Skor')->sortable(),
+            TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
+        ])
+        ->paginated(10);
+    }
 }
