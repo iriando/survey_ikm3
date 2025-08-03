@@ -2,57 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use Illuminate\Http\Request;
 use App\Models\Unsur;
 use App\Models\Pilihan_jawaban;
 use App\Models\Kegiatan;
 use App\Models\Responden;
 use App\Models\RespondenIkm;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Response;
+use App\Models\Pertanyaan;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 class ExportLaporanIkmPembinaanController extends Controller
 {
     public function export($kegiatanNama)
     {
-        // Cari kegiatan berdasarkan nama
-        $kegiatan = \App\Models\Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
+        $kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
 
-        // Cari responden berdasarkan nama kegiatan juga
-        $respondens = \App\Models\Responden::where('kegiatan', $kegiatanNama)->get();
+        $respondens = Responden::where('kegiatan', $kegiatanNama)->get();
         $jumlah_responden = $respondens->count();
-
-        $ids = $respondens->pluck('id');
-
-        $rata_skor = \App\Models\RespondenIkm::whereIn('id_biodata', $ids)
-                        ->whereNotNull('kd_unsurikmpembinaan')
-                        ->avg('skor');
-
-        $rata_skor = round($rata_skor, 2);
-
-        $kategori = match (true) {
-            $rata_skor >= 80 => 'Sangat Baik',
-            $rata_skor >= 60 => 'Baik',
-            $rata_skor >= 40 => 'Cukup',
-            default => 'Kurang',
-        };
 
         $tanggal_kegiatan = \Carbon\Carbon::parse($kegiatan->created_at)->translatedFormat('d F Y');
 
         $templatePath = storage_path('app/templates/laporan_ikm_pembinaan.docx');
-        $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
+        $templateProcessor = new TemplateProcessor($templatePath);
 
         $templateProcessor->setValue('nama_kegiatan', $kegiatan->n_kegiatan);
         $templateProcessor->setValue('tanggal_kegiatan', $tanggal_kegiatan);
         $templateProcessor->setValue('jumlah_responden', $jumlah_responden);
-        // $templateProcessor->setValue('rata_skor', $rata_skor);
-        // $templateProcessor->setValue('kategori', $kategori);
+
         $unsurs = Unsur::orderBy('kd_unsur')->get();
         $jumlah_unsur = $unsurs->count();
         $templateProcessor->setValue('jumlah_unsur', $jumlah_unsur);
-        // clonerow untuk tampilkan tabel unsur
-        $templateProcessor->cloneRow('no', $unsurs->count());
+        $templateProcessor->cloneRow('no', $jumlah_unsur);
+
         $bobot = $jumlah_unsur > 0 ? round(1 / $jumlah_unsur, 4) : 0;
         $templateProcessor->setValue('bobot', $bobot);
 
@@ -68,7 +50,6 @@ class ExportLaporanIkmPembinaanController extends Controller
 
         $rows = [];
         $no = 1;
-
         foreach ($kelompokPilihan as $mutu => $pilihan) {
             $rows[] = [
                 'no' => $no++,
@@ -76,13 +57,64 @@ class ExportLaporanIkmPembinaanController extends Controller
                 'pilihan' => $pilihan,
             ];
         }
-
-        // Clonerow untuk tampilkan pilihan jawaban dan mutu
         $templateProcessor->cloneRowAndSetValues('no', $rows);
 
-        $outputPath = storage_path('app/temp/laporan_ikm_pembinaan_' . time() . '.docx');
-        $templateProcessor->saveAs($outputPath);
+        // === Tabel responden dengan total dan rata-rata ===
+        $dataResponden = $this->getDataRespondenFixed($kegiatanNama); // array
 
-        return response()->download($outputPath)->deleteFileAfterSend(true);
+        $totals = [];
+        $counts = [];
+        $maxUnsur = 10;
+        foreach ($dataResponden as $row) {
+            for ($i = 1; $i <= $maxUnsur; $i++) {
+                $key = 'P' . $i;
+                $val = (int)($row[$key] ?? 0);
+                $totals[$key] = ($totals[$key] ?? 0) + $val;
+                $counts[$key] = ($counts[$key] ?? 0) + 1;
+            }
+        }
+
+        $dataResponden[] = array_merge(['id_biodata' => 'Jumlah nilai perparameter'], $totals);
+
+        $avgRow = ['id_biodata' => 'Nilai Rata-rata perparameter (NRR)'];
+        for ($i = 1; $i <= $maxUnsur; $i++) {
+            $key = 'P' . $i;
+            $avgRow[$key] = ($counts[$key] ?? 0) > 0 ? round($totals[$key] / $counts[$key], 2) : 0;
+        }
+        $dataResponden[] = $avgRow;
+
+        $templateProcessor->cloneRowAndSetValues('id_biodata', $dataResponden);
+
+        $laporanPath = storage_path('app/temp/laporan_ikm_pembinaan_' . time() . '.docx');
+        $templateProcessor->saveAs($laporanPath);
+
+        return response()->download($laporanPath)->deleteFileAfterSend(true);
+    }
+
+    public function getDataRespondenFixed($kegiatanNama)
+    {
+        $pertanyaan = Pertanyaan::with('unsur')->get();
+        $kd_unsur_list = $pertanyaan->pluck('unsur.kd_unsur')->unique()->values();
+
+        $query = DB::table('responden_ikms')
+            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->where('respondens.kegiatan', $kegiatanNama)
+            ->selectRaw('respondens.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
+                return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$kd}' THEN skor END) AS `{$kd}`";
+            })->implode(', '))
+            ->groupBy('respondens.id')
+            ->get();
+
+        $result = [];
+        foreach ($query as $row) {
+            $data = ['id_biodata' => $row->id_biodata];
+            for ($i = 1; $i <= 10; $i++) {
+                $kd = 'P' . $i;
+                $data[$kd] = property_exists($row, $kd) ? (int)$row->$kd : 0;
+            }
+            $result[] = $data;
+        }
+
+        return $result;
     }
 }
