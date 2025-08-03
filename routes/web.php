@@ -3,6 +3,7 @@
 use App\Filament\Pages\Laporan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RespondenController;
+use App\Http\Controllers\ExportLaporanikmpembinaanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,5 +35,7 @@ Route::post('/skmpelayanan/{id}/skm', [RespondenController::class, 'submitskmpel
 Route::get('/terima-kasih', function () {
     return view('thankyou');
 })->name('terima-kasih');
+
+Route::get('/export/laporan-ikm-pembinaan/{kegiatanNama}', [ExportLaporanIkmPembinaanController::class, 'export'])->name('export.ikm-pembinaan');
 
 // Route::get('/admin/laporan', Laporan::class)->name('filament.pages.laporan');

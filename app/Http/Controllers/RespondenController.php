@@ -10,7 +10,6 @@ use App\Models\Narasumber;
 use App\Models\Pertanyaan;
 use App\Models\RespondenIkm;
 use Illuminate\Http\Request;
-use App\Models\PertanyaanIkm;
 use App\Models\Pertanyaanikmpelayanan;
 
 class RespondenController extends Controller
@@ -96,7 +95,6 @@ class RespondenController extends Controller
             'narasumber_id' => 'required|exists:narasumbers,id',
         ]);
 
-        // dd($request->all());
         foreach ($request->jawaban as $kd_unsur => $skor) {
             RespondenIkm::create([
                 'id_biodata' => $id,

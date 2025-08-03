@@ -2,14 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use Filament\Tables;
 use Filament\Pages\Page;
 use App\Models\Responden;
-use App\Models\RespondenIkm;
 use App\Models\Pertanyaan;
+use Filament\Tables\Table;
+use App\Models\RespondenIkm;
+use Filament\Actions\Action;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
-use Filament\Tables\Table;
-use Filament\Tables;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
@@ -131,7 +132,6 @@ class Laporanikmpembinaan extends Page
         if ($this->kegiatan) {
             $query->where('respondens.kegiatan', $this->kegiatan);
         }
-        // dd($query->toSql(), $query->getBindings());
         return $query->groupBy('kd_unsurikmpembinaan')->get();
     }
 
@@ -168,41 +168,57 @@ class Laporanikmpembinaan extends Page
         return round($ikm, 2);
     }
 
-    public function table(Table $table): Table
+    // public function table(Table $table): Table
+    // {
+    //     return $table
+    //         ->query(function () {
+    //             $query = RespondenIkm::query()->with('responden');
+
+    //             if ($this->kegiatan) {
+    //                 $query->whereHas('responden', function ($q) {
+    //                     $q->where('kegiatan', $this->kegiatan);
+    //                 });
+    //             }
+
+    //             return $query;
+    //         })
+    //         ->columns([
+    //             TextColumn::make('responden.nama')
+    //                 ->label('Nama Responden')
+    //                 ->sortable()
+    //                 ->searchable(),
+
+    //             TextColumn::make('responden.usia')
+    //                 ->label('Usia')
+    //                 ->sortable(),
+
+    //             BadgeColumn::make('responden.gender')
+    //                 ->label('Gender')
+    //                 ->colors([
+    //                     'success' => 'Laki-laki',
+    //                     'danger' => 'Perempuan',
+    //                 ]),
+
+    //             TextColumn::make('kd_unsurikmpembinaan')->label('Kode Unsur')->sortable(),
+    //             TextColumn::make('skor')->label('Skor')->sortable(),
+    //             TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
+    //         ])
+    //         ->paginated(10);
+    // }
+
+    protected function getHeaderActions(): array
     {
-        return $table
-            ->query(function () {
-                $query = RespondenIkm::query()->with('responden');
-
-                if ($this->kegiatan) {
-                    $query->whereHas('responden', function ($q) {
-                        $q->where('kegiatan', $this->kegiatan);
-                    });
-                }
-
-                return $query;
-            })
-            ->columns([
-                TextColumn::make('responden.nama')
-                    ->label('Nama Responden')
-                    ->sortable()
-                    ->searchable(),
-
-                TextColumn::make('responden.usia')
-                    ->label('Usia')
-                    ->sortable(),
-
-                BadgeColumn::make('responden.gender')
-                    ->label('Gender')
-                    ->colors([
-                        'success' => 'Laki-laki',
-                        'danger' => 'Perempuan',
-                    ]),
-
-                TextColumn::make('kd_unsurikmpembinaan')->label('Kode Unsur')->sortable(),
-                TextColumn::make('skor')->label('Skor')->sortable(),
-                TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
-            ])
-            ->paginated(10);
+        return [
+            Action::make('unduh_word')
+                ->label('Unduh Word')
+                ->url(fn () => $this->kegiatan
+                    ? route('export.ikm-pembinaan', ['kegiatanNama' => $this->kegiatan])
+                    : '#')
+                ->disabled(fn () => !$this->kegiatan) // Disable tombol jika belum pilih kegiatan
+                ->openUrlInNewTab()
+                ->color('success')
+                ->icon('heroicon-m-arrow-down-tray'),
+        ];
     }
+
 }
