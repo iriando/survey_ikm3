@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Unsur;
 use App\Models\Pilihan_jawaban;
 use App\Models\Kegiatan;
 use App\Models\Responden;
-use App\Models\RespondenIkm;
 use App\Models\Pertanyaan;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
@@ -17,21 +15,21 @@ class ExportLaporanIkmPembinaanController extends Controller
     public function export($kegiatanNama)
     {
         $kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
-
         $respondens = Responden::where('kegiatan', $kegiatanNama)->get();
         $jumlah_responden = $respondens->count();
-
         $tanggal_kegiatan = \Carbon\Carbon::parse($kegiatan->created_at)->translatedFormat('d F Y');
+        $ikm = $this->getIkm($kegiatanNama);
 
         $templatePath = storage_path('app/templates/laporan_ikm_pembinaan.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
-
         $templateProcessor->setValue('nama_kegiatan', $kegiatan->n_kegiatan);
         $templateProcessor->setValue('tanggal_kegiatan', $tanggal_kegiatan);
         $templateProcessor->setValue('jumlah_responden', $jumlah_responden);
+        $templateProcessor->setValue('ikm', $ikm);
 
         $unsurs = Unsur::orderBy('kd_unsur')->get();
         $jumlah_unsur = $unsurs->count();
+
         $templateProcessor->setValue('jumlah_unsur', $jumlah_unsur);
         $templateProcessor->cloneRow('no', $jumlah_unsur);
 
@@ -59,8 +57,7 @@ class ExportLaporanIkmPembinaanController extends Controller
         }
         $templateProcessor->cloneRowAndSetValues('no', $rows);
 
-        // === Tabel responden dengan total dan rata-rata ===
-        $dataResponden = $this->getDataRespondenFixed($kegiatanNama); // array
+        $dataResponden = $this->getDataRespondenFixed($kegiatanNama);
 
         $totals = [];
         $counts = [];
@@ -82,6 +79,14 @@ class ExportLaporanIkmPembinaanController extends Controller
             $avgRow[$key] = ($counts[$key] ?? 0) > 0 ? round($totals[$key] / $counts[$key], 2) : 0;
         }
         $dataResponden[] = $avgRow;
+
+        $skmRow = ['id_biodata' => 'Nilai SKM perparameter'];
+        $skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
+        for ($i = 1; $i <= $maxUnsur; $i++) {
+            $kd = 'P' . $i;
+            $skmRow[$kd] = isset($skmData[$kd]) ? $skmData[$kd] : 0;
+        }
+        $dataResponden[] = $skmRow;
 
         $templateProcessor->cloneRowAndSetValues('id_biodata', $dataResponden);
 
@@ -117,4 +122,53 @@ class ExportLaporanIkmPembinaanController extends Controller
 
         return $result;
     }
+
+    public function getSkmPerParameter($kegiatanNama)
+    {
+        $totalParameter = Pertanyaan::count();
+        $bobot = 1 / $totalParameter;
+
+        $query = DB::table('responden_ikms')
+            ->whereNotNull('kegiatan')
+            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->select('kd_unsurikmpembinaan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"))
+            ->where('respondens.kegiatan', $kegiatanNama)
+            ->groupBy('kd_unsurikmpembinaan')
+            ->get();
+
+        return $query;
+    }
+
+    public function getIkm($kegiatanNama)
+    {
+        $totalParameter = Pertanyaan::count();
+        $totalNp = \App\Models\NilaiPersepsiIkm::count();
+
+        if ($totalParameter === 0 || $totalNp === 0) {
+            return null;
+        }
+
+        $konversi = 100 / $totalNp;
+        $bobot = 1 / $totalParameter;
+
+        $query = DB::table('responden_ikms')
+            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->whereNotNull('respondens.kegiatan');
+
+        if ($kegiatanNama) {
+            $query->where('respondens.kegiatan', $kegiatanNama);
+        }
+
+        $totalSkor = $query->sum('skor');
+        $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
+
+        if ($totalResponden === 0) {
+            return 0;
+        }
+
+        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
+
+        return round($ikm, 2);
+    }
+
 }

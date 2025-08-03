@@ -210,7 +210,7 @@ class Laporanikmpembinaan extends Page
     {
         return [
             Action::make('unduh_word')
-                ->label('Unduh Word')
+                ->label('Unduh Laporan.docx')
                 ->url(fn () => $this->kegiatan
                     ? route('export.ikm-pembinaan', ['kegiatanNama' => $this->kegiatan])
                     : '#')
