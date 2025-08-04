@@ -17,6 +17,6 @@ class Unsurikmpelayanan extends Model
 
     public function pertanyaan()
     {
-        return $this->hasOne(Pertanyaanikmpelayanan::class, 'kd_unsur', 'kd_unsur');
+        return $this->hasOne(Pertanyaanikmpelayanan::class, 'unsur_id');
     }
 }

@@ -12,21 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('responden_ikms', function (Blueprint $table) {
-            $table->id(); // Primary Key
-            $table->unsignedBigInteger('id_biodata'); // Foreign Key ke tabel responden
+            $table->id();
+            $table->unsignedBigInteger('id_biodata');
             $table->string('kd_unsurikmpembinaan')->nullable();
             $table->string('kd_unsurikmpelayanan')->nullable();
-            $table->integer('skor'); // Skor Jawaban
+            $table->integer('skor');
             $table->timestamps();
 
-            // Foreign Key ke tabel responden
             $table->foreign('id_biodata')->references('id')->on('respondens')->onDelete('cascade');
 
-            // Foreign Key ke tabel unsur ikm pembinaan
-            $table->foreign('kd_unsurikmpembinaan')->references('kd_unsur')->on('unsurs')->onDelete('cascade');
+            $table->foreign('kd_unsurikmpembinaan')->references('kd_unsur')->on('unsurs')->onDelete('cascade')->onUpdate('cascade');
 
-            // Foreign Key ke tabel unsur ikm pelayanan
-            $table->foreign('kd_unsurikmpelayanan')->references('kd_unsur')->on('unsurikmpelayanans')->onDelete('cascade');
+            $table->foreign('kd_unsurikmpelayanan')->references('kd_unsur')->on('unsurikmpelayanans')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

@@ -7,9 +7,10 @@ use Filament\Pages\Page;
 use App\Models\Responden;
 use Filament\Tables\Table;
 use App\Models\RespondenIkm;
-use App\Models\Pertanyaanikmpelayanan;
+use Filament\Actions\Action;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
+use App\Models\Pertanyaanikmpelayanan;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
@@ -249,5 +250,21 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
             TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
         ])
         ->paginated(10);
+    }
+
+    public function getHeaderActions(): array
+    {
+        return [
+            Action::make('Unduh Word')
+                ->color('primary')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->url(function () {
+                    return route('export.ikm.pelayanan', [
+                        'tanggalMulai' => $this->tanggalMulai,
+                        'tanggalAkhir' => $this->tanggalAkhir,
+                    ]);
+                }, shouldOpenInNewTab: true)
+                ->visible(fn () => $this->tanggalMulai && $this->tanggalAkhir),
+        ];
     }
 }
