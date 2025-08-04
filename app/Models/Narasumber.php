@@ -9,6 +9,7 @@ class Narasumber extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'kegiatan_id',
         'nama',
         'nip',
         'jabatan',
@@ -17,5 +18,10 @@ class Narasumber extends Model
     public function respondenikms()
     {
         return $this->hasMany(RespondenIkm::class);
+    }
+
+    public function kegiatan()
+    {
+        return $this->belongsTo(Kegiatan::class);
     }
 }

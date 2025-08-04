@@ -12,4 +12,10 @@ class Kegiatan extends Model
         'kd_kegiatan',
         'n_kegiatan',
     ];
+
+    public function narasumbers()
+    {
+        return $this->hasMany(Narasumber::class);
+    }
+
 }

@@ -35,7 +35,27 @@ class KegiatanResource extends Resource
                     ->label('Input Nama kegiatan')
                     ->required()
                     ->maxLength(255),
-            ]);
+                Forms\Components\Repeater::make('narasumbers')
+                ->label('Daftar Narasumber')
+                ->relationship()
+                ->schema([
+                    Forms\Components\TextInput::make('nama')
+                        ->required()
+                        ->label('Nama Narasumber'),
+
+                    Forms\Components\TextInput::make('nip')
+                        ->required()
+                        ->label('NIP'),
+
+                    Forms\Components\TextInput::make('jabatan')
+                        ->required()
+                        ->label('Jabatan'),
+                ])
+                ->columns(3)
+                ->defaultItems(1)
+                ->createItemButtonLabel('Tambah Narasumber'),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table

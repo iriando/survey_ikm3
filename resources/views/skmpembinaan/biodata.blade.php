@@ -112,21 +112,21 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Kegiatan</label>
-                            <select name="kegiatan" class="form-select" required>
-                                <option selected>Pilih Kegiatan</option>
+                            <select name="kegiatan" class="form-select" id="kegiatan-select" required>
+                                <option selected disabled>Pilih Kegiatan</option>
                                 @foreach($kegiatans as $kegiatan)
-                                    <option value="{{ $kegiatan->n_kegiatan }}">{{ $kegiatan->n_kegiatan }}</option>
+                                    <option value="{{ $kegiatan->n_kegiatan }}"
+                                        data-narasumber='@json($kegiatan->narasumbers)'>
+                                        {{ $kegiatan->n_kegiatan }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Narasumber</label>
-                            <select name="narasumber_id" class="form-select" required>
+                            <select name="narasumber_id" class="form-select" id="narasumber-select" required>
                                 <option value="" selected>Pilih Narasumber</option>
-                                @foreach($narasumbers as $narasumber)
-                                    <option value="{{ $narasumber->id }}">{{ $narasumber->nama }}</option>
-                                @endforeach
                             </select>
                         </div>
 
@@ -142,6 +142,26 @@
         </div>
 
       </div>
+      <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const kegiatanSelect = document.getElementById('kegiatan-select');
+                const narasumberSelect = document.getElementById('narasumber-select');
+
+                kegiatanSelect.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const narasumberData = JSON.parse(selectedOption.getAttribute('data-narasumber') || '[]');
+
+                    narasumberSelect.innerHTML = '<option value="">Pilih Narasumber</option>';
+                    narasumberData.forEach(n => {
+                        const option = document.createElement('option');
+                        option.value = n.id;
+                        option.textContent = n.nama;
+                        narasumberSelect.appendChild(option);
+                    });
+                });
+            });
+        </script>
+
 
     </section><!-- /Service Details Section -->
 
