@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             NilaiPersepsiIkmSeeder::class,
             UnsurIKMPembinaanSeeder::class,
+            UnsurIKMPelayananSeeder::class,
         ]);
         // \App\Models\User::factory(10)->create();
 

@@ -19,8 +19,8 @@ class UnsurIKMPelayananSeeder extends Seeder
             ['kd_unsur' => 'U5', 'nama_unsur' => 'Produk Spesifikasi Jenis Pembinaan', 'keterangan' => 'Sesuai spesifikasi'],
             ['kd_unsur' => 'U6', 'nama_unsur' => 'Kompetensi Pelaksana', 'keterangan' => 'Memiliki kemampuan sesuai bidang tugas'],
             ['kd_unsur' => 'U7', 'nama_unsur' => 'Perilaku Pelaksana', 'keterangan' => 'Ramah dan sopan'],
-            ['kd_unsur' => 'P8', 'nama_unsur' => 'Sarana dan Prasarana', 'keterangan' => 'Memadai dan nyaman'],
-            ['kd_unsur' => 'P9', 'nama_unsur' => 'Penanganan Pengaduan', 'keterangan' => 'Cepat dan jelas'],
+            ['kd_unsur' => 'U8', 'nama_unsur' => 'Sarana dan Prasarana', 'keterangan' => 'Memadai dan nyaman'],
+            ['kd_unsur' => 'U9', 'nama_unsur' => 'Penanganan Pengaduan', 'keterangan' => 'Cepat dan jelas'],
         ];
 
         foreach ($unsurs as $unsurData) {
