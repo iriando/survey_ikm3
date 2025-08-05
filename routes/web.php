@@ -4,6 +4,7 @@ use App\Filament\Pages\Laporan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RespondenController;
 use App\Http\Controllers\ExportLaporanikmpembinaanController;
+use App\Http\Controllers\ExportLaporanikmpembinaanPeriodeController;
 use App\Http\Controllers\ExportLaporanikmpelayananController;
 
 /*
@@ -38,6 +39,8 @@ Route::get('/terima-kasih', function () {
 })->name('terima-kasih');
 
 Route::get('/export/laporan-ikm-pembinaan/{kegiatanNama}', [ExportLaporanIkmPembinaanController::class, 'export'])->name('export.ikm-pembinaan');
+
+Route::get('/export/laporan-ikm-pembinaan-periode', [ExportLaporanIkmPembinaanPeriodeController::class, 'export'])->name('export.ikm-pembinaan-periode');
 
 Route::get('/export-ikm-pelayanan', [ExportLaporanIkmPelayananController::class, 'export'])
     ->name('export.ikm.pelayanan');

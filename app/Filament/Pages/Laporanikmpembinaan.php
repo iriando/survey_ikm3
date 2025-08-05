@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Tables;
+use App\Models\Kegiatan;
 use Filament\Pages\Page;
 use App\Models\Responden;
 use App\Models\Pertanyaan;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
+use Filament\Forms\Components\DatePicker;
 
 class Laporanikmpembinaan extends Page
 {
@@ -209,15 +211,48 @@ class Laporanikmpembinaan extends Page
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('unduh_word')
-                ->label('Unduh Laporan.docx')
-                ->url(fn () => $this->kegiatan
-                    ? route('export.ikm-pembinaan', ['kegiatanNama' => $this->kegiatan])
-                    : '#')
-                ->disabled(fn () => !$this->kegiatan) // Disable tombol jika belum pilih kegiatan
-                ->openUrlInNewTab()
+            // Tombol untuk export per kegiatan
+            Action::make('unduh_per_kegiatan')
+                ->label('perKegiatan')
                 ->color('success')
-                ->icon('heroicon-m-arrow-down-tray'),
+                ->icon('heroicon-m-arrow-down-tray')
+                ->form([
+                    Select::make('kegiatan')
+                        ->label('Pilih Kegiatan')
+                        ->options(Kegiatan::orderBy('n_kegiatan')->pluck('n_kegiatan', 'n_kegiatan'))
+                        ->required()
+                        ->searchable(),
+                ])
+                ->action(function (array $data) {
+                    return redirect()->route('export.ikm-pembinaan', [
+                        'kegiatanNama' => $data['kegiatan'],
+                    ]);
+                })
+                ->modalHeading('Pilih Kegiatan')
+                ->modalButton('Unduh'),
+
+            // Tombol untuk export per periode
+            Action::make('unduh_per_periode')
+                ->label('Periode')
+                ->color('primary')
+                ->icon('heroicon-m-calendar-days')
+                ->form([
+                    DatePicker::make('tanggalMulai')
+                        ->label('Tanggal Mulai')
+                        ->required(),
+                    DatePicker::make('tanggalAkhir')
+                        ->label('Tanggal Akhir')
+                        ->required()
+                        ->after('tanggalMulai'),
+                ])
+                ->action(function (array $data) {
+                    return redirect()->route('export.ikm-pembinaan-periode', [
+                        'tanggalMulai' => $data['tanggalMulai'],
+                        'tanggalAkhir' => $data['tanggalAkhir'],
+                    ]);
+                })
+                ->modalHeading('Pilih Periode')
+                ->modalButton('Unduh'),
         ];
     }
 

@@ -4,32 +4,59 @@ namespace App\Http\Controllers;
 
 use App\Models\Unsur;
 use App\Models\Pilihan_jawaban;
-use App\Models\Kegiatan;
 use App\Models\Responden;
 use App\Models\Pertanyaan;
+use App\Models\Kegiatan;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
+use Carbon\Carbon;
 
-class ExportLaporanIkmPembinaanController extends Controller
+class ExportLaporanIkmPembinaanPeriodeController extends Controller
 {
-    public function export($kegiatanNama)
+    public function export()
     {
-        $kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
-        $respondens = Responden::where('kegiatan', $kegiatanNama)->get();
-        $jumlah_responden = $respondens->count();
-        $tanggal_kegiatan = \Carbon\Carbon::parse($kegiatan->created_at)->translatedFormat('d F Y');
-        $ikm = $this->getIkm($kegiatanNama);
+        $tanggalMulai = request()->query('tanggalMulai');
+        $tanggalAkhir = request()->query('tanggalAkhir');
 
-        $templatePath = storage_path('app/templates/laporan_ikm_pembinaan_kegiatan.docx');
+        if (!$tanggalMulai || !$tanggalAkhir) {
+            abort(400, 'Tanggal mulai dan tanggal akhir harus diisi.');
+        }
+
+        // Ambil responden dalam periode
+        $respondens = Responden::whereNotNull('kegiatan')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalAkhir])
+            ->get();
+
+        $jumlah_responden = $respondens->count();
+        $ikm = $this->getIkm($tanggalMulai, $tanggalAkhir);
+
+        // Ambil daftar kegiatan unik dalam periode
+        $kegiatanList = $respondens->pluck('kegiatan')->unique()->values();
+        $kegiatanRows = [];
+        foreach ($kegiatanList as $index => $nama) {
+            $kegiatanRows[] = [
+                'no_kegiatan' => $index + 1,
+                'nama_kegiatan' => $nama,
+            ];
+        }
+
+        // Template
+        $templatePath = storage_path('app/templates/laporan_ikm_pembinaan_periode.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
-        $templateProcessor->setValue('nama_kegiatan', $kegiatan->n_kegiatan);
-        $templateProcessor->setValue('tanggal_kegiatan', $tanggal_kegiatan);
+
+        $templateProcessor->setValue('tanggal_mulai', Carbon::parse($tanggalMulai)->translatedFormat('d F Y'));
+        $templateProcessor->setValue('tanggal_akhir', Carbon::parse($tanggalAkhir)->translatedFormat('d F Y'));
         $templateProcessor->setValue('jumlah_responden', $jumlah_responden);
         $templateProcessor->setValue('ikm', $ikm);
 
+        // Clone daftar kegiatan di periode
+        if (count($kegiatanRows) > 0) {
+            $templateProcessor->cloneRowAndSetValues('no_kegiatan', $kegiatanRows);
+        }
+
+        // Unsur
         $unsurs = Unsur::orderBy('kd_unsur')->get();
         $jumlah_unsur = $unsurs->count();
-
         $templateProcessor->setValue('jumlah_unsur', $jumlah_unsur);
         $templateProcessor->cloneRow('no', $jumlah_unsur);
 
@@ -42,6 +69,7 @@ class ExportLaporanIkmPembinaanController extends Controller
             $templateProcessor->setValue("nama_unsur#{$i}", $unsur->nama_unsur);
         }
 
+        // Pilihan jawaban
         $kelompokPilihan = Pilihan_jawaban::all()
             ->groupBy(fn($item) => strtoupper(trim($item->mutu)))
             ->map(fn($items) => $items->pluck('teks_pilihan')->implode(', '));
@@ -57,7 +85,8 @@ class ExportLaporanIkmPembinaanController extends Controller
         }
         $templateProcessor->cloneRowAndSetValues('no', $rows);
 
-        $dataResponden = $this->getDataRespondenFixed($kegiatanNama);
+        // Data responden (dengan total, rata-rata, SKM)
+        $dataResponden = $this->getDataRespondenFixed($tanggalMulai, $tanggalAkhir);
 
         $totals = [];
         $counts = [];
@@ -81,7 +110,7 @@ class ExportLaporanIkmPembinaanController extends Controller
         $dataResponden[] = $avgRow;
 
         $skmRow = ['id_biodata' => 'Nilai SKM perparameter'];
-        $skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
+        $skmData = $this->getSkmPerParameter($tanggalMulai, $tanggalAkhir)->pluck('skm', 'kd_unsurikmpembinaan');
         for ($i = 1; $i <= $maxUnsur; $i++) {
             $kd = 'P' . $i;
             $skmRow[$kd] = isset($skmData[$kd]) ? $skmData[$kd] : 0;
@@ -90,20 +119,22 @@ class ExportLaporanIkmPembinaanController extends Controller
 
         $templateProcessor->cloneRowAndSetValues('id_biodata', $dataResponden);
 
-        $laporanPath = storage_path('app/temp/laporan_ikm_pembinaan_' . time() . '.docx');
+        // Simpan & download
+        $laporanPath = storage_path('app/temp/laporan_ikm_pembinaan_periode_' . time() . '.docx');
         $templateProcessor->saveAs($laporanPath);
 
         return response()->download($laporanPath)->deleteFileAfterSend(true);
     }
 
-    public function getDataRespondenFixed($kegiatanNama)
+    private function getDataRespondenFixed($tanggalMulai, $tanggalAkhir)
     {
         $pertanyaan = Pertanyaan::with('unsur')->get();
         $kd_unsur_list = $pertanyaan->pluck('unsur.kd_unsur')->unique()->values();
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->where('respondens.kegiatan', $kegiatanNama)
+            ->whereNotNull('respondens.kegiatan')
+            ->whereBetween(DB::raw('DATE(responden_ikms.updated_at)'), [$tanggalMulai, $tanggalAkhir])
             ->selectRaw('respondens.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
                 return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$kd}' THEN skor END) AS `{$kd}`";
             })->implode(', '))
@@ -123,23 +154,20 @@ class ExportLaporanIkmPembinaanController extends Controller
         return $result;
     }
 
-    public function getSkmPerParameter($kegiatanNama)
+    private function getSkmPerParameter($tanggalMulai, $tanggalAkhir)
     {
         $totalParameter = Pertanyaan::count();
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
-            ->whereNotNull('kegiatan')
+        return DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->whereBetween(DB::raw('DATE(responden_ikms.updated_at)'), [$tanggalMulai, $tanggalAkhir])
             ->select('kd_unsurikmpembinaan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"))
-            ->where('respondens.kegiatan', $kegiatanNama)
             ->groupBy('kd_unsurikmpembinaan')
             ->get();
-
-        return $query;
     }
 
-    public function getIkm($kegiatanNama)
+    private function getIkm($tanggalMulai, $tanggalAkhir)
     {
         $totalParameter = Pertanyaan::count();
         $totalNp = \App\Models\NilaiPersepsiIkm::count();
@@ -153,11 +181,7 @@ class ExportLaporanIkmPembinaanController extends Controller
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.kegiatan');
-
-        if ($kegiatanNama) {
-            $query->where('respondens.kegiatan', $kegiatanNama);
-        }
+            ->whereBetween(DB::raw('DATE(responden_ikms.updated_at)'), [$tanggalMulai, $tanggalAkhir]);
 
         $totalSkor = $query->sum('skor');
         $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
@@ -166,9 +190,6 @@ class ExportLaporanIkmPembinaanController extends Controller
             return 0;
         }
 
-        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
-
-        return round($ikm, 2);
+        return round(($totalSkor / $totalResponden) * $bobot * $konversi, 2);
     }
-
 }
