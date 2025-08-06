@@ -205,7 +205,6 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($totalResponden === 0) {
             return 0;
         }
-
         $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
 
         return round($ikm, 2);
