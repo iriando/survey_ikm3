@@ -148,13 +148,6 @@
                             </select>
                         </div>
 
-                        {{-- Narasumber --}}
-                        <div class="col-md-6">
-                            <label class="form-label">Narasumber</label>
-                            <select name="narasumber_id" class="form-select" id="narasumber-select" required>
-                                <option value="" selected>Pilih Narasumber</option>
-                            </select>
-                        </div>
                     </div>
 
                     {{-- Submit --}}
