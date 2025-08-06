@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('respondens', function (Blueprint $table) {
             $table->id();
             $table->string('nama', 255);
-            $table->integer('usia');
+            $table->string('usia');
             $table->string('gender', 255);
             $table->string('nohp', 255);
             $table->string('pendidikan', 255);
             $table->string('pekerjaan', 255);
-            $table->string('instansi', 255);
+            $table->string('instansi', 255)->nullable();
             $table->string('j_layanan', 255)->nullable();
             $table->timestamps();
         });

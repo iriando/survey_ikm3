@@ -18,6 +18,7 @@ class Responden extends Model
         'instansi',
         'j_layanan',
         'kegiatan',
+        'jabatan',
     ];
 
     public function jawabansurvey()

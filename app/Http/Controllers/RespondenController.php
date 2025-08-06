@@ -39,13 +39,14 @@ class RespondenController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'usia' => 'required|integer|min:1',
+            'usia' => 'required|string|',
             'gender' => 'required|string',
             'nohp' => 'required|string|max:255',
             'pendidikan' => 'required|string',
             'pekerjaan' => 'required|string',
-            'instansi' => 'required|string',
-            'j_layanan' => 'string',
+            'instansi' => 'string|nullable',
+            'j_layanan' => 'required|string',
+            'jabatan' => 'string|nullable',
         ]);
 
         $responden = Responden::create($request->all());
@@ -57,13 +58,14 @@ class RespondenController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'usia' => 'required|integer|min:1',
+            'usia' => 'required|string',
             'gender' => 'required|string',
             'nohp' => 'required|string|max:255',
             'pendidikan' => 'required|string',
             'pekerjaan' => 'required|string',
-            'instansi' => 'required|string',
-            'kegiatan' => 'string',
+            'instansi' => 'string|nullable',
+            'kegiatan' => 'required|string',
+            'jabatan' => 'string|nullable',
         ]);
 
         $responden = Responden::create($request->all());

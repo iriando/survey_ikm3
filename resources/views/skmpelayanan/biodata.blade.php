@@ -51,16 +51,26 @@
                 <form action="{{ route('skmpelayanan.biodata') }}" method="POST">
                     @csrf
                     <div class="row g-3">
+                        {{-- Nama --}}
                         <div class="col-md-6">
                             <label class="form-label">Nama</label>
                             <input type="text" name="nama" class="form-control" required>
                         </div>
 
+                        {{-- Usia --}}
                         <div class="col-md-3">
                             <label class="form-label">Usia</label>
-                            <input type="number" name="usia" class="form-control" min="1" required>
+                            <select name="usia" class="form-select" required>
+                                <option value="" selected>Pilih usia</option>
+                                <option value="20 - 30">20 - 30 tahun</option>
+                                <option value="31 - 40">31 - 40 tahun</option>
+                                <option value="41 - 50">41 - 50 tahun</option>
+                                <option value="51 - 60">51 - 60 tahun</option>
+                                <option value="61 keatas">61 tahun keatas</option>
+                            </select>
                         </div>
 
+                        {{-- Gender --}}
                         <div class="col-md-3">
                             <label class="form-label">Gender</label>
                             <select name="gender" class="form-select" required>
@@ -70,11 +80,13 @@
                             </select>
                         </div>
 
+                        {{-- No HP --}}
                         <div class="col-md-6">
                             <label class="form-label">No HP</label>
                             <input type="text" name="nohp" class="form-control" required>
                         </div>
 
+                        {{-- Pendidikan --}}
                         <div class="col-md-6">
                             <label class="form-label">Pendidikan</label>
                             <select name="pendidikan" class="form-select" required>
@@ -88,6 +100,7 @@
                             </select>
                         </div>
 
+                        {{-- Pekerjaan --}}
                         <div class="col-md-6">
                             <label class="form-label d-block">Pekerjaan</label>
                             <div class="form-check form-check-inline">
@@ -100,9 +113,23 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        {{-- Jabatan (Hidden by default) --}}
+                        <div class="col-md-6" id="jabatan-container" style="display:none;">
+                            <label class="form-label">Jabatan</label>
+                            <select name="jabatan" id="jabatan" class="form-select">
+                                <option value="" selected>Pilih Jabatan</option>
+                                <option value="Jabatan Pimpinan Tinggi">Jabatan Pimpinan Tinggi</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="Pengawas">Pengawas</option>
+                                <option value="Jabatan Fungsional Tertentu">Jabatan Fungsional Tertentu</option>
+                                <option value="Jabatan Pelaksana">Jabatan Pelaksana</option>
+                            </select>
+                        </div>
+
+                        {{-- Instansi (Hidden by default) --}}
+                        <div class="col-md-6" id="instansi-container" style="display:none;">
                             <label class="form-label">Instansi</label>
-                            <select name="instansi" class="form-select" required>
+                            <select name="instansi" id="instansi" class="form-select">
                                 <option value="" selected>Pilih Instansi</option>
                                 @foreach($instansi as $instansi)
                                     <option value="{{ $instansi->nama_instansi }}">{{ $instansi->nama_instansi }}</option>
@@ -110,7 +137,8 @@
                             </select>
                         </div>
 
-                        <div class="col-md-12">
+                        {{-- layanan --}}
+                        <div class="col-md-6">
                             <label class="form-label">Jenis Layanan</label>
                             <select name="j_layanan" class="form-select" required>
                                 <option selected>Pilih Jenis Layanan</option>
@@ -120,8 +148,16 @@
                             </select>
                         </div>
 
+                        {{-- Narasumber --}}
+                        <div class="col-md-6">
+                            <label class="form-label">Narasumber</label>
+                            <select name="narasumber_id" class="form-select" id="narasumber-select" required>
+                                <option value="" selected>Pilih Narasumber</option>
+                            </select>
+                        </div>
                     </div>
 
+                    {{-- Submit --}}
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-success px-4">Simpan</button>
                     </div>
@@ -132,7 +168,35 @@
         </div>
 
       </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const pnsRadio = document.getElementById('pns');
+                const nonAsnRadio = document.getElementById('nonasn');
+                const jabatanContainer = document.getElementById('jabatan-container');
+                const instansiContainer = document.getElementById('instansi-container');
+                const jabatanSelect = document.getElementById('jabatan');
+                const instansiSelect = document.getElementById('instansi');
 
+                function toggleFields() {
+                    if (pnsRadio.checked) {
+                        jabatanContainer.style.display = 'block';
+                        instansiContainer.style.display = 'block';
+                    } else {
+                        jabatanContainer.style.display = 'none';
+                        instansiContainer.style.display = 'none';
+                        jabatanSelect.value = '';
+                        instansiSelect.value = '';
+                    }
+                }
+
+                // Event listener
+                pnsRadio.addEventListener('change', toggleFields);
+                nonAsnRadio.addEventListener('change', toggleFields);
+
+                // Cek kondisi saat halaman dimuat (misal form reload karena error)
+                toggleFields();
+            });
+            </script>
     </section><!-- /Service Details Section -->
 
   </main>

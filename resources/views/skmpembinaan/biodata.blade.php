@@ -48,19 +48,39 @@
                     </div>
                 @endif
 
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form action="{{ route('skmpembinaan.biodata') }}" method="POST">
                     @csrf
                     <div class="row g-3">
+                        {{-- Nama --}}
                         <div class="col-md-6">
                             <label class="form-label">Nama</label>
                             <input type="text" name="nama" class="form-control" required>
                         </div>
 
+                        {{-- Usia --}}
                         <div class="col-md-3">
                             <label class="form-label">Usia</label>
-                            <input type="number" name="usia" class="form-control" min="1" required>
+                            <select name="usia" class="form-select" required>
+                                <option value="" selected>Pilih usia</option>
+                                <option value="20 - 30">20 - 30 tahun</option>
+                                <option value="31 - 40">31 - 40 tahun</option>
+                                <option value="41 - 50">41 - 50 tahun</option>
+                                <option value="51 - 60">51 - 60 tahun</option>
+                                <option value="61 keatas">61 tahun keatas</option>
+                            </select>
                         </div>
 
+                        {{-- Gender --}}
                         <div class="col-md-3">
                             <label class="form-label">Gender</label>
                             <select name="gender" class="form-select" required>
@@ -70,11 +90,13 @@
                             </select>
                         </div>
 
+                        {{-- No HP --}}
                         <div class="col-md-6">
                             <label class="form-label">No HP</label>
                             <input type="text" name="nohp" class="form-control" required>
                         </div>
 
+                        {{-- Pendidikan --}}
                         <div class="col-md-6">
                             <label class="form-label">Pendidikan</label>
                             <select name="pendidikan" class="form-select" required>
@@ -88,21 +110,24 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label d-block">Pekerjaan</label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="pekerjaan" id="pns" value="Pegawai Negeri Sipil" required>
-                                <label class="form-check-label" for="pns">Pegawai Negeri Sipil</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="pekerjaan" id="nonasn" value="Non ASN" required>
-                                <label class="form-check-label" for="nonasn">Non ASN</label>
-                            </div>
+                        {{-- Pekerjaan --}}
+                        <input type="hidden" name="pekerjaan" value="Pegawai Negeri Sipil">
+
+                        <div class="col-md-6" id="jabatan-container">
+                            <label class="form-label">Jabatan</label>
+                            <select name="jabatan" id="jabatan" class="form-select">
+                                <option value="" selected>Pilih Jabatan</option>
+                                <option value="Jabatan Pimpinan Tinggi">Jabatan Pimpinan Tinggi</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="Pengawas">Pengawas</option>
+                                <option value="Jabatan Fungsional Tertentu">Jabatan Fungsional Tertentu</option>
+                                <option value="Jabatan Pelaksana">Jabatan Pelaksana</option>
+                            </select>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="instansi-container">
                             <label class="form-label">Instansi</label>
-                            <select name="instansi" class="form-select" required>
+                            <select name="instansi" id="instansi" class="form-select">
                                 <option value="" selected>Pilih Instansi</option>
                                 @foreach($instansi as $instansi)
                                     <option value="{{ $instansi->nama_instansi }}">{{ $instansi->nama_instansi }}</option>
@@ -110,6 +135,7 @@
                             </select>
                         </div>
 
+                        {{-- Kegiatan --}}
                         <div class="col-md-6">
                             <label class="form-label">Kegiatan</label>
                             <select name="kegiatan" class="form-select" id="kegiatan-select" required>
@@ -123,15 +149,16 @@
                             </select>
                         </div>
 
+                        {{-- Narasumber --}}
                         <div class="col-md-6">
                             <label class="form-label">Narasumber</label>
                             <select name="narasumber_id" class="form-select" id="narasumber-select" required>
                                 <option value="" selected>Pilih Narasumber</option>
                             </select>
                         </div>
-
                     </div>
 
+                    {{-- Submit --}}
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-success px-4">Simpan</button>
                     </div>
@@ -142,7 +169,7 @@
         </div>
 
       </div>
-      <script>
+        <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const kegiatanSelect = document.getElementById('kegiatan-select');
                 const narasumberSelect = document.getElementById('narasumber-select');
@@ -161,7 +188,6 @@
                 });
             });
         </script>
-
 
     </section><!-- /Service Details Section -->
 

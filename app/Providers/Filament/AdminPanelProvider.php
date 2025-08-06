@@ -29,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandname('Admin IKM Kanreg XIV BKN')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
