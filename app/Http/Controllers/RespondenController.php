@@ -106,7 +106,7 @@ class RespondenController extends Controller
             ]);
         }
 
-        return redirect()->route('terima-kasih');
+        return redirect()->route('kritik-saran.form', $id);
     }
 
     // Menyimpan Jawaban Survei
@@ -123,6 +123,25 @@ class RespondenController extends Controller
                 'skor' => $skor,
             ]);
         }
+
+        return redirect()->route('kritik-saran.form', $id);
+    }
+
+    public function kritiksaran($id)
+    {
+        $responden = Responden::findOrFail($id);
+        return view('kritik-saran', compact('responden'));
+    }
+
+    public function submitkritiksaran(Request $request, $id)
+    {
+        $request->validate([
+            'kritik_saran' => 'nullable|string|max:1000',
+        ]);
+
+        $responden = Responden::findOrFail($id);
+        $responden->kritik_saran = $request->input('kritik_saran');
+        $responden->save();
 
         return redirect()->route('terima-kasih');
     }

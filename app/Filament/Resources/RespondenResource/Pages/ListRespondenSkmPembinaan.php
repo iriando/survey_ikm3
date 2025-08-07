@@ -35,9 +35,12 @@ class ListRespondenSkmPembinaan extends ListRecords
                 Tables\Columns\TextColumn::make('pekerjaan')->label('Pekerjaan')->searchable(),
                 Tables\Columns\TextColumn::make('instansi')->label('Instansi')->searchable(),
                 Tables\Columns\TextColumn::make('kegiatan')->label('Kegiatan')->searchable(),
+                Tables\Columns\TextColumn::make('kritik_saran')->label('Kritik & Saran'),
                 Tables\Columns\TextColumn::make('created_at')->label('Tanggal Isi')->date('d/m/Y'),
             ])
-            ->actions([])
+            ->actions([
+                Tables\Actions\DeleteAction::make('Hapus'),
+            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);

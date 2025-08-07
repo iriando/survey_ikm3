@@ -32,40 +32,43 @@ class RespondenResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nama')
-                    ->label('Nama')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('usia')
-                    ->label('Usia'),
-                Tables\Columns\TextColumn::make('gender')
-                    ->label('Jenis Kelamin'),
-                Tables\Columns\TextColumn::make('nohp')
-                    ->label('No. HP'),
-                Tables\Columns\TextColumn::make('pendidikan')
-                    ->label('Pendidikan'),
-                Tables\Columns\TextColumn::make('pekerjaan')
-                    ->label('Pekerjaan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('instansi')
-                    ->label('Instansi')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('kegiatan')
-                    ->label('Kegiatan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Tanggal isi')
-                    ->date('d/m/Y'),
+                // Tables\Columns\TextColumn::make('nama')
+                //     ->label('Nama')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('usia')
+                //     ->label('Usia'),
+                // Tables\Columns\TextColumn::make('gender')
+                //     ->label('Jenis Kelamin'),
+                // Tables\Columns\TextColumn::make('nohp')
+                //     ->label('No. HP'),
+                // Tables\Columns\TextColumn::make('pendidikan')
+                //     ->label('Pendidikan'),
+                // Tables\Columns\TextColumn::make('pekerjaan')
+                //     ->label('Pekerjaan')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('instansi')
+                //     ->label('Instansi')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('kegiatan')
+                //     ->label('Kegiatan')
+                //     ->searchable(),
+                // Tables\Columns\TextColumn::make('kritik_saran')
+                //     ->label('Kritik & Saran'),
+                // Tables\Columns\TextColumn::make('created_at')
+                //     ->label('Tanggal isi')
+                //     ->date('d/m/Y'),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make('Hapus'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 

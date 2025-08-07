@@ -34,6 +34,9 @@ Route::post('/skmpelayanan/biodata', [RespondenController::class, 'storeskmpelay
 Route::get('/skmpelayanan/{id}/skm', [RespondenController::class, 'skmpelayanan'])->name('skmpelayanan.skm');
 Route::post('/skmpelayanan/{id}/skm', [RespondenController::class, 'submitskmpelayanan'])->name('skmpelayanan.submitSkm');
 
+Route::get('/kritik-saran/{id}', [RespondenController::class, 'kritiksaran'])->name('kritik-saran.form');
+Route::post('/kritik-saran/{id}', [RespondenController::class, 'submitkritiksaran'])->name('kritik-saran.submit');
+
 Route::get('/terima-kasih', function () {
     return view('thankyou');
 })->name('terima-kasih');
