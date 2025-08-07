@@ -3,9 +3,9 @@
 use App\Filament\Pages\Laporan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RespondenController;
-use App\Http\Controllers\ExportLaporanikmpembinaanController;
-use App\Http\Controllers\ExportLaporanikmpembinaanPeriodeController;
-use App\Http\Controllers\ExportLaporanikmpelayananController;
+use App\Http\Controllers\ExportLaporaniKMPembinaanController;
+use App\Http\Controllers\ExportLaporaniKMPembinaanPeriodeController;
+use App\Http\Controllers\ExportLaporaniKMPelayananController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,11 +38,11 @@ Route::get('/terima-kasih', function () {
     return view('thankyou');
 })->name('terima-kasih');
 
-Route::get('/export/laporan-ikm-pembinaan/{kegiatanNama}', [ExportLaporanIkmPembinaanController::class, 'export'])->name('export.ikm-pembinaan');
+Route::get('/export/laporan-ikm-pembinaan/{kegiatanNama}', [ExportLaporanIKMPembinaanController::class, 'export'])->name('export.ikm-pembinaan');
 
-Route::get('/export/laporan-ikm-pembinaan-periode', [ExportLaporanIkmPembinaanPeriodeController::class, 'export'])->name('export.ikm-pembinaan-periode');
+Route::get('/export/laporan-ikm-pembinaan-periode', [ExportLaporanIKMPembinaanPeriodeController::class, 'export'])->name('export.ikm-pembinaan-periode');
 
-Route::get('/export-ikm-pelayanan', [ExportLaporanIkmPelayananController::class, 'export'])
+Route::get('/export-ikm-pelayanan', [ExportLaporanIKMPelayananController::class, 'export'])
     ->name('export.ikm.pelayanan');
 
 

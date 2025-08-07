@@ -39,16 +39,14 @@ class UnsurikmpelayananResource extends Resource
 
                 Forms\Components\TextArea::make('keterangan')
                     ->label('Keterangan')
-                    ->maxLength(255)
-                    ->columnSpan(2),
+                    ->maxLength(255),
 
                 Forms\Components\Fieldset::make('Pertanyaan')
                     ->relationship('pertanyaan')
                     ->schema([
                         Forms\Components\Textarea::make('teks_pertanyaan')
                             ->label('Teks Pertanyaan')
-                            ->required()
-                            ->columnSpanFull(),
+                            ->required(),
 
                         Forms\Components\Repeater::make('pilihanJawabans')
                             ->label('Pilihan Jawaban')

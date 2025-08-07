@@ -54,8 +54,7 @@ class PertanyaanResource extends Resource
 
                 Forms\Components\TextArea::make('teks_pertanyaan')
                     ->label('Pertanyaan')
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
             ]);
     }
 

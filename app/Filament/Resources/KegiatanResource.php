@@ -33,8 +33,7 @@ class KegiatanResource extends Resource
                     ->maxLength(25),
                 Forms\Components\TextArea::make('n_kegiatan')
                     ->label('Input Nama kegiatan')
-                    ->required()
-                    ->maxLength(255),
+                    ->required(),
                 Forms\Components\Repeater::make('narasumbers')
                 ->label('Daftar Narasumber')
                 ->relationship()
