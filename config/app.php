@@ -126,6 +126,10 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'master_key' => env('APP_MASTER_KEY'),
+
+    'master_key_emails' => explode(',', env('APP_MASTER_KEY_EMAILS')),
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
