@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\RespondenResource\Pages;
 
-use App\Filament\Resources\RespondenResource;
-use Filament\Resources\Pages\ListRecords;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\RespondenResource;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ListRespondenSkmPembinaan extends ListRecords
 {
@@ -43,6 +45,7 @@ class ListRespondenSkmPembinaan extends ListRecords
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                ExportBulkAction::make(),
             ]);
     }
 }

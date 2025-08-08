@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\RespondenResource\Pages;
 
-use App\Filament\Resources\RespondenResource;
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\RespondenResource;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ListRespondenSkmPelayanan extends ListRecords
 {
@@ -49,11 +50,29 @@ class ListRespondenSkmPelayanan extends ListRecords
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal Isi')->date('d/m/Y'),
             ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('gender')
+                    ->options([
+                        'Laki-laki' => 'Laki-laki',
+                        'Perempuan' => 'Perempuan',
+                    ]),
+                Tables\Filters\SelectFilter::make('pekerjaan')
+                    ->options([
+                        'Pegawai Negeri Sipil' => 'PNS',
+                        'Non ASN' => 'Non ASN',
+                    ]),
+            //     Tables\Filters\SelectFilter::make('pendidikan')
+            //         ->options([
+            //             'Pegawai Negeri Sipil' => 'PNS',
+            //             'Non ASN' => 'Non ASN',
+            //         ]),
+            ])
             ->actions([
                 Tables\Actions\DeleteAction::make('Hapus'),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                ExportBulkAction::make()
             ]);
     }
 }
