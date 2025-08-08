@@ -11,6 +11,7 @@ class Kegiatan extends Model
     protected $fillable = [
         'kd_kegiatan',
         'n_kegiatan',
+        'status',
     ];
 
     public function narasumbers()

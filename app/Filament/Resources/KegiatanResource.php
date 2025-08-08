@@ -53,6 +53,10 @@ class KegiatanResource extends Resource
                 ->columns(3)
                 ->defaultItems(1)
                 ->createItemButtonLabel('Tambah Narasumber'),
+                Forms\Components\Toggle::make('status')
+                    ->label('Status Kegiatan')
+                    ->default(true) // default aktif
+                    ->inline(false),
             ])
             ->columns(1);
     }
@@ -67,9 +71,14 @@ class KegiatanResource extends Resource
                 Tables\Columns\TextColumn::make('n_kegiatan')
                     ->label('Nama Kegiatan')
                     ->searchable(),
+                Tables\Columns\IconColumn::make('status')
+                    ->label('Status')
+                    ->boolean(),
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('status')
+                    ->label('Status Kegiatan')
+                    ->boolean(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

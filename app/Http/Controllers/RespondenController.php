@@ -29,7 +29,10 @@ class RespondenController extends Controller
 
     public function createskmpembinaan()
     {
-        $kegiatans = Kegiatan::with('narasumbers')->orderBy('n_kegiatan')->get();
+        $kegiatans = Kegiatan::with('narasumbers')
+            ->where('status', 1)
+            ->orderBy('n_kegiatan')
+            ->get();
         $instansi = Instansi::all();
         $narasumbers = Narasumber::all();
         return view('skmpembinaan.biodata', compact('kegiatans', 'instansi', 'narasumbers'));
