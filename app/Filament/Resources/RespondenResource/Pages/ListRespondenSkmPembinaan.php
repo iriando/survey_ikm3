@@ -3,8 +3,9 @@
 namespace App\Filament\Resources\RespondenResource\Pages;
 
 use Filament\Tables;
+use App\Models\Responden;
 use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\RespondenResource;
@@ -39,6 +40,54 @@ class ListRespondenSkmPembinaan extends ListRecords
                 Tables\Columns\TextColumn::make('kegiatan')->label('Kegiatan')->searchable(),
                 Tables\Columns\TextColumn::make('kritik_saran')->label('Kritik & Saran'),
                 Tables\Columns\TextColumn::make('created_at')->label('Tanggal Isi')->date('d/m/Y'),
+            ])
+            ->filters([
+                Tables\Filters\Filter::make('periode')
+                    ->form([
+                        DatePicker::make('start_date')->label('Tanggal Mulai'),
+                        DatePicker::make('end_date')->label('Tanggal Akhir'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['start_date'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['end_date'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
+                    }),
+                Tables\Filters\SelectFilter::make('gender')
+                    ->options([
+                        'Laki-laki' => 'Laki-laki',
+                        'Perempuan' => 'Perempuan',
+                    ]),
+                Tables\Filters\SelectFilter::make('pekerjaan')
+                    ->options([
+                        'Pegawai Negeri Sipil' => 'PNS',
+                        'Non ASN' => 'Non ASN',
+                    ]),
+                Tables\Filters\SelectFilter::make('usia')
+                    ->options(
+                        Responden::query()
+                        ->select('usia')
+                        ->distinct()
+                        ->pluck('usia', 'usia')
+                        ->toArray()
+                    ),
+                Tables\Filters\SelectFilter::make('pendidikan')
+                    ->options(
+                        Responden::query()
+                        ->select('pendidikan')
+                        ->distinct()
+                        ->pluck('pendidikan', 'pendidikan')
+                        ->toArray()
+                    ),
+                Tables\Filters\SelectFilter::make('kegiatan')
+                    ->label('Kegiatan')
+                    ->options(
+                        Responden::query()
+                            ->whereNotNull('kegiatan') // biar tidak ada null yang bikin error
+                            ->select('kegiatan')
+                            ->distinct()
+                            ->pluck('kegiatan', 'kegiatan')
+                            ->toArray()
+                    ),
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make('Hapus'),
