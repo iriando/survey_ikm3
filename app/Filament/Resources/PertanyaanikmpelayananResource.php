@@ -35,6 +35,7 @@ class PertanyaanikmpelayananResource extends Resource
                         return Unsurikmpelayanan::pluck('nama_unsur', 'id');
                     })
                     ->required()
+                    ->disabled()
                     ->reactive()
                     ->afterStateUpdated(function ($state, Set $set) {
                         $kdUnsur = Unsurikmpelayanan::find($state)?->kd_unsur;
@@ -51,9 +52,10 @@ class PertanyaanikmpelayananResource extends Resource
                     ->disabled()
                     ->dehydrated(false),
 
-                Forms\Components\TextArea::make('teks_pertanyaan')
+                Forms\Components\Textarea::make('teks_pertanyaan')
                     ->label('Pertanyaan')
-                    ->required(),
+                    ->required()
+                    ->columnSpanFull(),
             ]);
     }
 

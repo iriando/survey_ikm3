@@ -13,7 +13,13 @@ class ListKegiatans extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Buat kegiatan baru'),
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return 'Kegiatan';
     }
 }

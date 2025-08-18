@@ -33,7 +33,8 @@ class PilihanJawabanikmpelayananResource extends Resource
                     ->label('Pertanyaan')
                     ->searchable()
                     ->options(Pertanyaanikmpelayanan::all()->pluck('teks_pertanyaan', 'id'))
-                    ->required(),
+                    ->required()
+                    ->disabled(),
                 Forms\Components\TextInput::make('teks_pilihan')
                     ->label('Teks Pilihan')
                     ->required(),
@@ -50,11 +51,13 @@ class PilihanJawabanikmpelayananResource extends Resource
                             $set('mutu', $mutu);
                         }
                     })
-                    ->required(),
+                    ->required()
+                    ->disabled(),
                 Forms\Components\TextInput::make('mutu')
                     ->label('Mutu')
                     ->readOnly()
-                    ->required(),
+                    ->required()
+                    ->disabled(),
             ]);
     }
 

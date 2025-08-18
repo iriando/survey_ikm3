@@ -35,6 +35,7 @@ class PertanyaanResource extends Resource
                         return Unsur::pluck('nama_unsur', 'id');
                     })
                     ->required()
+                    ->disabled()
                     ->reactive()
                     ->afterStateUpdated(function ($state, Set $set) {
                         $kdUnsur = Unsur::find($state)?->kd_unsur;
@@ -52,9 +53,10 @@ class PertanyaanResource extends Resource
                     ->dehydrated(false), // agar tidak disimpan ke DB
                     // atau kamu bisa hidden() jika hanya untuk internal
 
-                Forms\Components\TextArea::make('teks_pertanyaan')
+                Forms\Components\Textarea::make('teks_pertanyaan')
                     ->label('Pertanyaan')
-                    ->required(),
+                    ->required()
+                    ->columnSpanFull(),
             ]);
     }
 

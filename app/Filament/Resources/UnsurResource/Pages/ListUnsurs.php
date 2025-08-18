@@ -13,7 +13,13 @@ class ListUnsurs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label('Buat unsur baru'),
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return 'Unsur IKM Pembinaan';
     }
 }

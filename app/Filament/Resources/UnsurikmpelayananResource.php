@@ -37,9 +37,10 @@ class UnsurikmpelayananResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\TextArea::make('keterangan')
+                Forms\Components\Textarea::make('keterangan')
                     ->label('Keterangan')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
 
                 Forms\Components\Fieldset::make('Pertanyaan')
                     ->relationship('pertanyaan')

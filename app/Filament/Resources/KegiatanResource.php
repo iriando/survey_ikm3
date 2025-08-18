@@ -31,7 +31,7 @@ class KegiatanResource extends Resource
                     ->label('Input Kode kegiatan')
                     ->required()
                     ->maxLength(25),
-                Forms\Components\TextArea::make('n_kegiatan')
+                Forms\Components\Textarea::make('n_kegiatan')
                     ->label('Input Nama kegiatan')
                     ->required(),
                 Forms\Components\Repeater::make('narasumbers')
@@ -52,13 +52,14 @@ class KegiatanResource extends Resource
                 ])
                 ->columns(3)
                 ->defaultItems(1)
-                ->createItemButtonLabel('Tambah Narasumber'),
+                ->createItemButtonLabel('Tambah Narasumber')
+                ->columnSpanFull(),
                 Forms\Components\Toggle::make('status')
                     ->label('Status Kegiatan')
                     ->default(true) // default aktif
                     ->inline(false),
             ])
-            ->columns(1);
+            ->columns(2);
     }
 
     public static function table(Table $table): Table
@@ -88,9 +89,10 @@ class KegiatanResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
-            ]);
+            // ->emptyStateActions([
+            //     Tables\Actions\CreateAction::make(),
+            // ])
+            ;
     }
 
     public static function getRelations(): array

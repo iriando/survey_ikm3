@@ -28,9 +28,11 @@ class LayananResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('pokja')
+                    ->label('Input nama kelompok kerja')
                     ->required()
                     ->maxLength(25),
                 Forms\Components\TextInput::make('j_layanan')
+                    ->label('Input jenis layanan')
                     ->required()
                     ->maxLength(255),
             ]);

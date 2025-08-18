@@ -16,4 +16,9 @@ class ListPilihanJawabanikmpelayanans extends ListRecords
             // Actions\CreateAction::make(),
         ];
     }
+
+    public function getTitle(): string
+    {
+        return 'Pilihan Jawaban IKM Pelayanan';
+    }
 }
