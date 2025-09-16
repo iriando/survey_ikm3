@@ -15,7 +15,7 @@ class ExportLaporanIkmPembinaanController extends Controller
     public function export($kegiatanNama)
     {
         $kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
-        $respondens = Responden::where('kegiatan', $kegiatanNama)->get();
+        $respondens = Responden::where('kegiatan', $kegiatanNama)->whereHas('jawabansurvey')->get();
         $jumlah_responden = $respondens->count();
         $tanggal_kegiatan = \Carbon\Carbon::parse($kegiatan->created_at)->translatedFormat('d F Y');
         $ikm = $this->getIkm($kegiatanNama);

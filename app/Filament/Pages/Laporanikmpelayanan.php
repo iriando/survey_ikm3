@@ -94,7 +94,8 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
     public function getGenderCount()
     {
         $query = Responden::query()
-            ->whereNotNull('j_layanan');
+            ->whereNotNull('j_layanan')
+            ->whereHas('jawabansurvey');;
 
         if ($this->tanggalMulai) {
             $query->whereDate('created_at', '>=', $this->tanggalMulai);
@@ -114,7 +115,8 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
     public function getPendidikanCount()
     {
         $query = Responden::query()
-            ->whereNotNull('j_layanan');
+            ->whereNotNull('j_layanan')
+            ->whereHas('jawabansurvey');
 
         if ($this->tanggalMulai) {
             $query->whereDate('created_at', '>=', $this->tanggalMulai);

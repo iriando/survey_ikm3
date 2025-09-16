@@ -23,6 +23,7 @@ class ExportLaporanIkmPelayananController extends Controller
 
         // Jumlah responden
         $jumlah_responden = Responden::whereNotNull('j_layanan')
+            ->whereHas('jawabansurvey')
             ->whereBetween('created_at', [$tanggalMulai, $tanggalAkhir])
             ->when($jenisLayanan, fn ($q) => $q->where('j_layanan', $jenisLayanan))
             ->count();

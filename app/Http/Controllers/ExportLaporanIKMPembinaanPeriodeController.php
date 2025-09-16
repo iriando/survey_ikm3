@@ -25,6 +25,7 @@ class ExportLaporanIkmPembinaanPeriodeController extends Controller
         // Ambil responden dalam periode
         $respondens = Responden::whereNotNull('kegiatan')
             ->whereBetween(DB::raw('DATE(created_at)'), [$tanggalMulai, $tanggalAkhir])
+            ->whereHas('jawabansurvey')
             ->get();
 
         $jumlah_responden = $respondens->count();

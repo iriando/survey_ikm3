@@ -68,7 +68,8 @@ class Laporanikmpembinaan extends Page
     public function getGenderCount()
     {
         $query = Responden::query()
-            ->whereNotNull('kegiatan');
+            ->whereNotNull('kegiatan')
+            ->whereHas('jawabansurvey');
 
         if ($this->kegiatan) {
             $query->where('kegiatan', $this->kegiatan);
@@ -82,7 +83,8 @@ class Laporanikmpembinaan extends Page
     public function getPendidikanCount()
     {
         $query = Responden::query()
-            ->whereNotNull('kegiatan');
+            ->whereNotNull('kegiatan')
+            ->whereHas('jawabansurvey');
 
         if ($this->kegiatan) {
             $query->where('kegiatan', $this->kegiatan);
