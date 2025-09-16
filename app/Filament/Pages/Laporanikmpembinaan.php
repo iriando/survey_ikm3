@@ -170,44 +170,6 @@ class Laporanikmpembinaan extends Page
         return round($ikm, 2);
     }
 
-    // public function table(Table $table): Table
-    // {
-    //     return $table
-    //         ->query(function () {
-    //             $query = RespondenIkm::query()->with('responden');
-
-    //             if ($this->kegiatan) {
-    //                 $query->whereHas('responden', function ($q) {
-    //                     $q->where('kegiatan', $this->kegiatan);
-    //                 });
-    //             }
-
-    //             return $query;
-    //         })
-    //         ->columns([
-    //             TextColumn::make('responden.nama')
-    //                 ->label('Nama Responden')
-    //                 ->sortable()
-    //                 ->searchable(),
-
-    //             TextColumn::make('responden.usia')
-    //                 ->label('Usia')
-    //                 ->sortable(),
-
-    //             BadgeColumn::make('responden.gender')
-    //                 ->label('Gender')
-    //                 ->colors([
-    //                     'success' => 'Laki-laki',
-    //                     'danger' => 'Perempuan',
-    //                 ]),
-
-    //             TextColumn::make('kd_unsurikmpembinaan')->label('Kode Unsur')->sortable(),
-    //             TextColumn::make('skor')->label('Skor')->sortable(),
-    //             TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
-    //         ])
-    //         ->paginated(10);
-    // }
-
     protected function getHeaderActions(): array
     {
         return [

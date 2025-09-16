@@ -14,6 +14,7 @@ use App\Models\Pertanyaanikmpelayanan;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 
 class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 {
@@ -27,24 +28,37 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
     public ?string $layanan = null;
     public ?string $tanggalMulai = null;
     public ?string $tanggalAkhir = null;
+    public ?string $jenisLayanan = null; // tambahan
 
     public function getFormSchema(): array
     {
         return [
             \Filament\Forms\Components\Grid::make()
-            ->columns(2)
-            ->schema([
-                DatePicker::make('tanggalMulai')
-                    ->label('Tanggal Mulai')
-                    ->reactive()
-                    ->afterStateUpdated(fn () => $this->resetTable()),
+                ->columns(3)
+                ->schema([
+                    DatePicker::make('tanggalMulai')
+                        ->label('Tanggal Mulai')
+                        ->reactive()
+                        ->afterStateUpdated(fn () => $this->resetTable()),
 
-                DatePicker::make('tanggalAkhir')
-                    ->label('Tanggal Akhir')
-                    ->reactive()
-                    ->after('tanggalMulai')
-                    ->afterStateUpdated(fn () => $this->resetTable()),
-            ]),
+                    DatePicker::make('tanggalAkhir')
+                        ->label('Tanggal Akhir')
+                        ->reactive()
+                        ->after('tanggalMulai')
+                        ->afterStateUpdated(fn () => $this->resetTable()),
+
+                    Select::make('jenisLayanan')
+                        ->label('Jenis Layanan')
+                        ->options(
+                            Responden::query()
+                                ->whereNotNull('j_layanan')
+                                ->distinct()
+                                ->pluck('j_layanan', 'j_layanan')
+                        )
+                        ->searchable()
+                        ->reactive()
+                        ->afterStateUpdated(fn () => $this->resetTable()),
+                ]),
         ];
     }
 
@@ -54,7 +68,7 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan') // Tidak null
+            ->whereNotNull('respondens.j_layanan')
             ->selectRaw('respondens.nama AS nama_responden, ' . collect($pertanyaan)->map(function ($p) {
                 return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
             })->implode(', ') . ', DATE(responden_ikms.updated_at) as tanggal');
@@ -62,10 +76,13 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('responden_ikms.updated_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('responden_ikms.updated_at', '<=', $this->tanggalAkhir);
         }
+        if ($this->jenisLayanan) {
+            $query->where('respondens.j_layanan', $this->jenisLayanan);
+        }
+
         return $query->groupBy('respondens.nama', 'tanggal')->get();
     }
 
@@ -82,9 +99,11 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('created_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('created_at', '<=', $this->tanggalAkhir);
+        }
+        if ($this->jenisLayanan) {
+            $query->where('j_layanan', $this->jenisLayanan);
         }
 
         return $query->select('gender', DB::raw('count(*) as total'))
@@ -100,9 +119,11 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('created_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('created_at', '<=', $this->tanggalAkhir);
+        }
+        if ($this->jenisLayanan) {
+            $query->where('j_layanan', $this->jenisLayanan);
         }
 
         return $query->select('pendidikan', DB::raw('count(*) as total'))
@@ -120,9 +141,11 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+        }
+        if ($this->jenisLayanan) {
+            $query->where('respondens.j_layanan', $this->jenisLayanan);
         }
 
         return $query
@@ -130,7 +153,6 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
             ->groupBy('kd_unsurikmpelayanan')
             ->get();
     }
-
 
     public function getAveragePerParameter()
     {
@@ -141,22 +163,24 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
         }
+        if ($this->jenisLayanan) {
+            $query->where('respondens.j_layanan', $this->jenisLayanan);
+        }
 
         return $query
-        ->select('kd_unsurikmpelayanan', DB::raw('FORMAT(AVG(skor), 2) as avg_skor'))
-        ->groupBy('kd_unsurikmpelayanan')
-        ->get();
+            ->select('kd_unsurikmpelayanan', DB::raw('FORMAT(AVG(skor), 2) as avg_skor'))
+            ->groupBy('kd_unsurikmpelayanan')
+            ->get();
     }
-
 
     public function getSkmPerParameter()
     {
         $totalParameter = Pertanyaanikmpelayanan::count();
         $bobot = 1 / $totalParameter;
+
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
             ->whereNotNull('j_layanan');
@@ -164,9 +188,11 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+        }
+        if ($this->jenisLayanan) {
+            $query->where('respondens.j_layanan', $this->jenisLayanan);
         }
 
         return $query
@@ -194,9 +220,11 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($this->tanggalMulai) {
             $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
         }
-
         if ($this->tanggalAkhir) {
             $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+        }
+        if ($this->jenisLayanan) {
+            $query->where('respondens.j_layanan', $this->jenisLayanan);
         }
 
         $totalSkor = $query->sum('skor');
@@ -205,50 +233,53 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         if ($totalResponden === 0) {
             return 0;
         }
-        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
 
+        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
         return round($ikm, 2);
     }
-
 
     public function table(Table $table): Table
     {
         return $table
-        ->query(function () {
-            $query = RespondenIkm::query()->with('responden');
+            ->query(function () {
+                $query = RespondenIkm::query()->with('responden');
 
-            if ($this->tanggalMulai) {
-                $query->whereDate('updated_at', '>=', $this->tanggalMulai);
-            }
+                if ($this->tanggalMulai) {
+                    $query->whereDate('updated_at', '>=', $this->tanggalMulai);
+                }
+                if ($this->tanggalAkhir) {
+                    $query->whereDate('updated_at', '<=', $this->tanggalAkhir);
+                }
+                if ($this->jenisLayanan) {
+                    $query->whereHas('responden', function ($q) {
+                        $q->where('j_layanan', $this->jenisLayanan);
+                    });
+                }
 
-            if ($this->tanggalAkhir) {
-                $query->whereDate('updated_at', '<=', $this->tanggalAkhir);
-            }
+                return $query;
+            })
+            ->columns([
+                TextColumn::make('responden.nama')
+                    ->label('Nama Responden')
+                    ->sortable()
+                    ->searchable(),
 
-            return $query;
-        })
-        ->columns([
-            TextColumn::make('responden.nama')
-                ->label('Nama Responden')
-                ->sortable()
-                ->searchable(),
+                TextColumn::make('responden.usia')
+                    ->label('Usia')
+                    ->sortable(),
 
-            TextColumn::make('responden.usia')
-                ->label('Usia')
-                ->sortable(),
+                BadgeColumn::make('responden.gender')
+                    ->label('Gender')
+                    ->colors([
+                        'success' => 'Laki-laki',
+                        'danger' => 'Perempuan',
+                    ]),
 
-            BadgeColumn::make('responden.gender')
-                ->label('Gender')
-                ->colors([
-                    'success' => 'Laki-laki',
-                    'danger' => 'Perempuan',
-                ]),
-
-            TextColumn::make('kd_unsur')->label('Kode Unsur')->sortable(),
-            TextColumn::make('skor')->label('Skor')->sortable(),
-            TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
-        ])
-        ->paginated(10);
+                TextColumn::make('kd_unsur')->label('Kode Unsur')->sortable(),
+                TextColumn::make('skor')->label('Skor')->sortable(),
+                TextColumn::make('created_at')->label('Tanggal dibuat')->sortable(),
+            ])
+            ->paginated(10);
     }
 
     public function getHeaderActions(): array
@@ -261,6 +292,7 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
                     return route('export.ikm.pelayanan', [
                         'tanggalMulai' => $this->tanggalMulai,
                         'tanggalAkhir' => $this->tanggalAkhir,
+                        'jenisLayanan' => $this->jenisLayanan,
                     ]);
                 }, shouldOpenInNewTab: true)
                 ->visible(fn () => $this->tanggalMulai && $this->tanggalAkhir),

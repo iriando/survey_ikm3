@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Responden;
 use Illuminate\Http\Request;
-use App\Models\Pilihan_jawaban;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
 use App\Models\Pertanyaanikmpelayanan;
@@ -15,16 +14,20 @@ class ExportLaporanIkmPelayananController extends Controller
 {
     public function export(Request $request)
     {
-        $tanggalMulai = $request->input('tanggalMulai');
-        $tanggalAkhir = $request->input('tanggalAkhir');
+        $tanggalMulai   = $request->input('tanggalMulai');
+        $tanggalAkhir   = $request->input('tanggalAkhir');
+        $jenisLayanan   = $request->input('jenisLayanan'); // tambahan
 
         $templatePath = storage_path('app/templates/laporan_ikm_pelayanan.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
 
+        // Jumlah responden
         $jumlah_responden = Responden::whereNotNull('j_layanan')
             ->whereBetween('created_at', [$tanggalMulai, $tanggalAkhir])
+            ->when($jenisLayanan, fn ($q) => $q->where('j_layanan', $jenisLayanan))
             ->count();
-        $ikm = $this->getIkm($tanggalMulai, $tanggalAkhir);
+
+        $ikm = $this->getIkm($tanggalMulai, $tanggalAkhir, $jenisLayanan);
 
         $templateProcessor->setValue('tanggal_mulai', \Carbon\Carbon::parse($tanggalMulai)->translatedFormat('d F Y'));
         $templateProcessor->setValue('tanggal_akhir', \Carbon\Carbon::parse($tanggalAkhir)->translatedFormat('d F Y'));
@@ -60,7 +63,7 @@ class ExportLaporanIkmPelayananController extends Controller
         $templateProcessor->cloneRowAndSetValues('no', $rows);
 
         // Tabel responden + total, rata-rata, skm
-        $dataResponden = $this->getDataRespondenFixed($tanggalMulai, $tanggalAkhir);
+        $dataResponden = $this->getDataRespondenFixed($tanggalMulai, $tanggalAkhir, $jenisLayanan);
 
         $totals = [];
         $counts = [];
@@ -84,7 +87,8 @@ class ExportLaporanIkmPelayananController extends Controller
         $dataResponden[] = $avgRow;
 
         $skmRow = ['id_biodata' => 'Nilai SKM perparameter'];
-        $skmData = $this->getSkmPerParameter($tanggalMulai, $tanggalAkhir)->pluck('skm', 'kd_unsurikmpelayanan');
+        $skmData = $this->getSkmPerParameter($tanggalMulai, $tanggalAkhir, $jenisLayanan)
+            ->pluck('skm', 'kd_unsurikmpelayanan');
         for ($i = 1; $i <= $maxUnsur; $i++) {
             $kd = 'U' . $i;
             $skmRow[$kd] = isset($skmData[$kd]) ? $skmData[$kd] : 0;
@@ -99,7 +103,7 @@ class ExportLaporanIkmPelayananController extends Controller
         return response()->download($laporanPath)->deleteFileAfterSend(true);
     }
 
-    public function getDataRespondenFixed($tanggalMulai, $tanggalAkhir)
+    public function getDataRespondenFixed($tanggalMulai, $tanggalAkhir, $jenisLayanan = null)
     {
         $pertanyaan = Pertanyaanikmpelayanan::with('unsur')->get();
         $kd_unsur_list = $pertanyaan->pluck('unsur.kd_unsur')->unique()->values();
@@ -107,15 +111,19 @@ class ExportLaporanIkmPelayananController extends Controller
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
             ->whereNotNull('respondens.j_layanan')
-            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir])
-            ->selectRaw('respondens.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
-                return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$kd}' THEN skor END) AS `{$kd}`";
-            })->implode(', '))
-            ->groupBy('respondens.id')
-            ->get();
+            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir]);
+
+        if ($jenisLayanan) {
+            $query->where('respondens.j_layanan', $jenisLayanan);
+        }
+
+        $query->selectRaw('respondens.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
+            return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$kd}' THEN skor END) AS `{$kd}`";
+        })->implode(', '))
+        ->groupBy('respondens.id');
 
         $result = [];
-        foreach ($query as $row) {
+        foreach ($query->get() as $row) {
             $data = ['id_biodata' => $row->id_biodata];
             for ($i = 1; $i <= 10; $i++) {
                 $kd = 'U' . $i;
@@ -123,26 +131,29 @@ class ExportLaporanIkmPelayananController extends Controller
             }
             $result[] = $data;
         }
-        // dd($result);
-        // die;
         return $result;
     }
 
-    public function getSkmPerParameter($tanggalMulai, $tanggalAkhir)
+    public function getSkmPerParameter($tanggalMulai, $tanggalAkhir, $jenisLayanan = null)
     {
         $totalParameter = Pertanyaanikmpelayanan::count();
         $bobot = 1 / $totalParameter;
 
-        return DB::table('responden_ikms')
+        $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
             ->whereNotNull('respondens.j_layanan')
-            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir])
-            ->select('kd_unsurikmpelayanan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"))
+            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir]);
+
+        if ($jenisLayanan) {
+            $query->where('respondens.j_layanan', $jenisLayanan);
+        }
+
+        return $query->select('kd_unsurikmpelayanan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"))
             ->groupBy('kd_unsurikmpelayanan')
             ->get();
     }
 
-    public function getIkm($tanggalMulai, $tanggalAkhir)
+    public function getIkm($tanggalMulai, $tanggalAkhir, $jenisLayanan = null)
     {
         $totalParameter = Pertanyaanikmpelayanan::count();
         $totalNp = NilaiPersepsiIkm::count();
@@ -156,11 +167,19 @@ class ExportLaporanIkmPelayananController extends Controller
             ->whereNotNull('respondens.j_layanan')
             ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir]);
 
+        if ($jenisLayanan) {
+            $query->where('respondens.j_layanan', $jenisLayanan);
+        }
+
         $totalSkor = $query->sum('skor');
         $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
 
-        if ($totalResponden === 0) return 0;
+        if ($totalResponden === 0) {
+            return 0;
+        }
 
-        return round(($totalSkor / $totalResponden) * $bobot * $konversi, 2);
+        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
+
+        return round($ikm, 2);
     }
 }
