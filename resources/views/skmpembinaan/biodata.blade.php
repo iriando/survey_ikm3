@@ -116,7 +116,7 @@
 
                         <div class="col-md-6" id="jabatan-container">
                             <label class="form-label">Jabatan</label>
-                            <select name="jabatan" id="jabatan" class="form-select">
+                            <select name="jabatan" id="jabatan" class="form-select" required>
                                 <option value="" selected>Pilih Jabatan</option>
                                 <option value="Jabatan Pimpinan Tinggi">Jabatan Pimpinan Tinggi</option>
                                 <option value="Administrator">Administrator</option>
