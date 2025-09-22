@@ -48,5 +48,6 @@ Route::get('/export/laporan-ikm-pembinaan-periode', [ExportLaporanIKMPembinaanPe
 Route::get('/export-ikm-pelayanan', [ExportLaporanIKMPelayananController::class, 'export'])
     ->name('export.ikm.pelayanan');
 
+Route::get('captcha/{config?}', '\Mews\Captcha\CaptchaController@getCaptcha');
 
 // Route::get('/admin/laporan', Laporan::class)->name('filament.pages.laporan');

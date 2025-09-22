@@ -14,6 +14,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "mews/captcha": "^3.4",
         "phpoffice/phpword": "^1.4",
         "pxlrbt/filament-excel": "^2.4"
     },
