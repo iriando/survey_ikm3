@@ -3,9 +3,9 @@
 use App\Filament\Pages\Laporan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RespondenController;
-use App\Http\Controllers\ExportLaporaniKMPembinaanController;
-use App\Http\Controllers\ExportLaporaniKMPembinaanPeriodeController;
-use App\Http\Controllers\ExportLaporaniKMPelayananController;
+use App\Http\Controllers\ExportLaporanIkmPembinaanController;
+use App\Http\Controllers\ExportLaporanIkmPembinaanPeriodeController;
+use App\Http\Controllers\ExportLaporanIkmPelayananController;
 
 /*
 |--------------------------------------------------------------------------
