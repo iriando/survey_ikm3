@@ -84,7 +84,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Gender</label>
                             <select name="gender" class="form-select" required>
-                                <option value="" selected>Pilih Gender</option>
+                                <option value="" selected disabled>Pilih Gender</option>
                                 <option value="Laki-laki">Laki-laki</option>
                                 <option value="Perempuan">Perempuan</option>
                             </select>
@@ -100,7 +100,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Pendidikan</label>
                             <select name="pendidikan" class="form-select" required>
-                                <option value="" selected>Pilih Pendidikan</option>
+                                <option value="" selected disabled>Pilih Pendidikan</option>
                                 <option value="SD">SD</option>
                                 <option value="SMP">SMP</option>
                                 <option value="SMA">SMA</option>
@@ -117,7 +117,7 @@
                         <div class="col-md-6" id="jabatan-container">
                             <label class="form-label">Jabatan</label>
                             <select name="jabatan" id="jabatan" class="form-select" required>
-                                <option value="" selected>Pilih Jabatan</option>
+                                <option value="" selected disabled>Pilih Jabatan</option>
                                 <option value="Jabatan Pimpinan Tinggi">Jabatan Pimpinan Tinggi</option>
                                 <option value="Administrator">Administrator</option>
                                 <option value="Pengawas">Pengawas</option>
@@ -129,7 +129,7 @@
                         <div class="col-md-6" id="instansi-container">
                             <label class="form-label">Instansi</label>
                             <select name="instansi" id="instansi" class="form-select">
-                                <option value="" selected>Pilih Instansi</option>
+                                <option value="" selected disabled>Pilih Instansi</option>
                                 @foreach($instansi as $instansi)
                                     <option value="{{ $instansi->nama_instansi }}">{{ $instansi->nama_instansi }}</option>
                                 @endforeach
@@ -140,7 +140,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Kegiatan</label>
                             <select name="kegiatan" class="form-select" id="kegiatan-select" required>
-                                <option selected disabled>Pilih Kegiatan</option>
+                                <option value="" selected disabled>Pilih Kegiatan</option>
                                 @foreach($kegiatans as $kegiatan)
                                     <option value="{{ $kegiatan->n_kegiatan }}"
                                         data-narasumber='@json($kegiatan->narasumbers)'>
@@ -154,7 +154,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Narasumber</label>
                             <select name="narasumber_id" class="form-select" id="narasumber-select" required>
-                                <option value="" selected>Pilih Narasumber</option>
+                                <option value="" selected disabled>Pilih Narasumber</option>
                             </select>
                         </div>
                     </div>

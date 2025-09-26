@@ -52,7 +52,6 @@
                             <div class="card-body">
                                 <input type="hidden" name="narasumber_id" value="{{ request('narasumber_id') }}">
                                 <p><strong>{{ $pertanyaan->teks_pertanyaan }}</strong></p>
-
                                 @foreach($pertanyaan->pilihanJawabans as $jawaban)
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="jawaban[{{ $pertanyaan->unsur->kd_unsur }}]" value="{{ $jawaban->np }}" required>

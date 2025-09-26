@@ -13,6 +13,7 @@ class RespondenIkm extends Model
         'id_biodata',
         'kd_unsurikmpelayanan',
         'kd_unsurikmpembinaan',
+        'kd_unsurikmtu',
         'narasumber_id',
         'skor',
     ];
@@ -31,6 +32,11 @@ class RespondenIkm extends Model
     public function pertanyaanikmpelayanan()
     {
         return $this->belongsTo(Pertanyaanikmpelayanan::class, 'kd_unsurikmpelayanan', 'kd_unsur');
+    }
+
+    public function pertanyaanikmtu()
+    {
+        return $this->belongsTo(Pertanyaanikmtu::class, 'kd_unsurikmtu', 'kd_unsur');
     }
 
     public function narasumber()

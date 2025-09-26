@@ -48,7 +48,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('skmpelayanan.biodata') }}" method="POST">
+                <form action="{{ route('skmtu.biodata') }}" method="POST">
                     @csrf
                     <div class="row g-3">
                         {{-- Nama --}}
@@ -141,7 +141,7 @@
                         {{-- layanan --}}
                         <div class="col-md-6">
                             <label class="form-label">Jenis Layanan</label>
-                            <select name="j_layanan" class="form-select" required>
+                            <select name="j_layanantu" class="form-select" required>
                                 <option value="" selected disabled>Pilih Jenis Layanan</option>
                                 @foreach($layanans as $layanan)
                                     <option value="{{ $layanan->j_layanan }}">{{ $layanan->j_layanan }}</option>
