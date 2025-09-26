@@ -13,6 +13,7 @@ use Filament\Navigation\NavigationGroup;
 use App\Filament\Widgets\IkmPerBulanChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Pages\Auth\Login as BaseLogin;
+use App\Filament\Widgets\IkmPerLayananChart;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -46,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
                 IkmPerBulanChart::class,
+                IkmPerLayananChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
