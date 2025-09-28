@@ -23,7 +23,8 @@ class ListRespondenSkmPelayanan extends ListRecords
     public function getTableQuery(): ?Builder
     {
         return RespondenResource::getEloquentQuery()
-            ->whereNotNull('j_layanan');
+            ->whereNotNull('j_layanan')
+            ->orderBy('nama', 'asc');
     }
 
     public function table(Table $table): Table
