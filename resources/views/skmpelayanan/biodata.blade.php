@@ -14,11 +14,10 @@
           <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
 
             <div class="service-box">
-              <h4>Serices List</h4>
+              <h4>Formulir</h4>
               <div class="services-list">
                 <a href="#" class="active"><i class="bi bi-arrow-right-circle"></i><span>Isi biodata</span></a>
                 <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Isi survey IKM</span></a>
-                {{-- <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Isi survey IPK</span></a> --}}
               </div>
             </div><!-- End Services List -->
 
@@ -61,7 +60,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Usia</label>
                             <select name="usia" class="form-select" required>
-                                <option value="" selected>Pilih usia</option>
+                                <option value="" selected disabled>Pilih usia</option>
                                 <option value="20 - 30">20 - 30 tahun</option>
                                 <option value="31 - 40">31 - 40 tahun</option>
                                 <option value="41 - 50">41 - 50 tahun</option>
@@ -74,7 +73,7 @@
                         <div class="col-md-3">
                             <label class="form-label">Gender</label>
                             <select name="gender" class="form-select" required>
-                                <option value="" selected>Pilih Gender</option>
+                                <option value="" selected disabled>Pilih Jenis Kelamin</option>
                                 <option value="Laki-laki">Laki-laki</option>
                                 <option value="Perempuan">Perempuan</option>
                             </select>
@@ -90,7 +89,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Pendidikan</label>
                             <select name="pendidikan" class="form-select" required>
-                                <option value="" selected>Pilih Pendidikan</option>
+                                <option value="" selected disabled>Pilih Pendidikan</option>
                                 <option value="SD">SD</option>
                                 <option value="SMP">SMP</option>
                                 <option value="SMA">SMA</option>
@@ -118,7 +117,7 @@
                         <div class="col-md-6" id="jabatan-container" style="display:none;">
                             <label class="form-label">Jabatan</label>
                             <select name="jabatan" id="jabatan" class="form-select">
-                                <option value="" selected>Pilih Jabatan</option>
+                                <option value="" selected disabled>Pilih Jabatan</option>
                                 <option value="Jabatan Pimpinan Tinggi">Jabatan Pimpinan Tinggi</option>
                                 <option value="Administrator">Administrator</option>
                                 <option value="Pengawas">Pengawas</option>
@@ -131,7 +130,7 @@
                         <div class="col-md-6" id="instansi-container" style="display:none;">
                             <label class="form-label">Instansi</label>
                             <select name="instansi" id="instansi" class="form-select">
-                                <option value="" selected>Pilih Instansi</option>
+                                <option value="" selected disabled>Pilih Instansi</option>
                                 @foreach($instansi as $instansi)
                                     <option value="{{ $instansi->nama_instansi }}">{{ $instansi->nama_instansi }}</option>
                                 @endforeach
@@ -142,7 +141,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Jenis Layanan</label>
                             <select name="j_layanan" class="form-select" required>
-                                <option selected>Pilih Jenis Layanan</option>
+                                <option selected disabled>Pilih Jenis Layanan</option>
                                 @foreach($layanans as $layanan)
                                     <option value="{{ $layanan->j_layanan }}">{{ $layanan->j_layanan }}</option>
                                 @endforeach
