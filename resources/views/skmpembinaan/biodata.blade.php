@@ -12,7 +12,6 @@
                     <div class="services-list">
                         <a href="#" class="active" style="background-color: #af1e1e; color: white;"><i class="bi bi-arrow-right-circle"></i><span>Isi biodata</span></a>
                         <a href="#"><i class="bi bi-arrow-right-circle" ></i><span>Isi SKM Pembinaan</span></a>
-                        {{-- <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Isi survey IPK</span></a> --}}
                     </div>
                 </div><!-- End Services List -->
                 {{-- <div class="service-box">
@@ -22,7 +21,6 @@
                         <a href="#"><i class="bi bi-file-earmark-word"></i><span>Catalog DOC</span></a>
                     </div>
                 </div><!-- End Services List -->
-
                 <div class="help-box d-flex flex-column justify-content-center align-items-center">
                     <i class="bi bi-headset help-icon"></i>
                     <h4>Have a Question?</h4>
@@ -30,7 +28,6 @@
                     <p class="d-flex align-items-center mt-1 mb-0"><i class="bi bi-envelope me-2"></i> <a href="mailto:contact@example.com">contact@example.com</a></p>
                 </div> --}}
             </div>
-
             <div class="col-lg-8 ps-lg-5" data-aos="fade-up" data-aos-delay="200">
                 <div class="card-body p-4">
                     @if(session('success'))
@@ -39,7 +36,6 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>
@@ -49,7 +45,6 @@
                             </ul>
                         </div>
                     @endif
-
                     <form action="{{ route('skmpembinaan.biodata') }}" method="POST">
                         @csrf
                         <div class="row g-3">
@@ -58,7 +53,6 @@
                                 <label class="form-label">Nama</label>
                                 <input type="text" name="nama" class="form-control" required>
                             </div>
-
                             {{-- Usia --}}
                             <div class="col-md-3">
                                 <label class="form-label">Usia</label>
@@ -71,7 +65,6 @@
                                     <option value="61 keatas">61 tahun keatas</option>
                                 </select>
                             </div>
-
                             {{-- Gender --}}
                             <div class="col-md-3">
                                 <label class="form-label">Gender</label>
@@ -81,13 +74,11 @@
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
                             </div>
-
                             {{-- No HP --}}
                             <div class="col-md-6">
                                 <label class="form-label">No HP</label>
                                 <input type="text" name="nohp" class="form-control" required>
                             </div>
-
                             {{-- Pendidikan --}}
                             <div class="col-md-6">
                                 <label class="form-label">Pendidikan</label>
@@ -102,10 +93,8 @@
                                     <option value="S2">S3</option>
                                 </select>
                             </div>
-
                             {{-- Pekerjaan --}}
                             <input type="hidden" name="pekerjaan" value="Pegawai Negeri Sipil">
-
                             <div class="col-md-6" id="jabatan-container">
                                 <label class="form-label">Jabatan</label>
                                 <select name="jabatan" id="jabatan" class="form-select" required>
@@ -117,7 +106,6 @@
                                     <option value="Jabatan Pelaksana">Jabatan Pelaksana</option>
                                 </select>
                             </div>
-
                             <div class="col-md-6" id="instansi-container">
                                 <label class="form-label">Instansi</label>
                                 <select name="instansi" id="instansi" class="form-select" required>
@@ -127,7 +115,6 @@
                                     @endforeach
                                 </select>
                             </div>
-
                             {{-- Kegiatan --}}
                             <div class="col-md-6">
                                 <label class="form-label">Kegiatan</label>
@@ -141,7 +128,6 @@
                                     @endforeach
                                 </select>
                             </div>
-
                             {{-- Narasumber --}}
                             <div class="col-md-6">
                                 <label class="form-label">Narasumber</label>
@@ -150,7 +136,6 @@
                                 </select>
                             </div>
                         </div>
-
                         {{-- Submit --}}
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-success px-4">Simpan</button>
@@ -167,7 +152,6 @@
             kegiatanSelect.addEventListener('change', function () {
                 const selectedOption = this.options[this.selectedIndex];
                 const narasumberData = JSON.parse(selectedOption.getAttribute('data-narasumber') || '[]');
-
                 narasumberSelect.innerHTML = '<option value="">Pilih Narasumber</option>';
                 narasumberData.forEach(n => {
                     const option = document.createElement('option');
