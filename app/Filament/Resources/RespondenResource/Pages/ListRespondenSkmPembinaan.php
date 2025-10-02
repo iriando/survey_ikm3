@@ -35,7 +35,7 @@ class ListRespondenSkmPembinaan extends ListRecords
                 Tables\Columns\TextColumn::make('gender')->label('Jenis Kelamin'),
                 Tables\Columns\TextColumn::make('nohp')->label('No. HP'),
                 Tables\Columns\TextColumn::make('pendidikan')->label('Pendidikan'),
-                Tables\Columns\TextColumn::make('pekerjaan')->label('Pekerjaan')->searchable(),
+                Tables\Columns\TextColumn::make('jabatan')->label('Jabatan')->searchable(),
                 Tables\Columns\TextColumn::make('instansi')->label('Instansi')->searchable(),
                 Tables\Columns\TextColumn::make('kegiatan')->label('Kegiatan')->searchable(),
                 Tables\Columns\TextColumn::make('kritik_saran')->label('Kritik & Saran'),

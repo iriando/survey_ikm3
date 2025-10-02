@@ -42,7 +42,7 @@
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
       <a href="{{route('/')}}" class="logo d-flex align-items-center me-auto">
-        <h1 class="sitename">Survey Kepuasan Masyarakat</h1>
+        <h1 class="sitename">Halaman Utama</h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
