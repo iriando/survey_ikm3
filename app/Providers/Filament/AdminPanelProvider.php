@@ -11,6 +11,7 @@ use Filament\Support\Colors\Color;
 use Filament\Navigation\NavigationItem;
 use Filament\Navigation\NavigationGroup;
 use App\Filament\Widgets\IkmPerBulanChart;
+use App\Filament\Widgets\IkmPerPokjaChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Pages\Auth\Login as BaseLogin;
 use App\Filament\Widgets\IkmPerLayananChart;
@@ -48,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
                 // Widgets\FilamentInfoWidget::class,
                 IkmPerBulanChart::class,
                 IkmPerLayananChart::class,
+                IkmPerPokjaChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
