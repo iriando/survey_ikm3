@@ -34,9 +34,9 @@ Route::post('/skmpelayanan/biodata', [RespondenController::class, 'storeskmpelay
 Route::get('/skmpelayanan/{id}/skm', [RespondenController::class, 'skmpelayanan'])->name('skmpelayanan.skm');
 Route::post('/skmpelayanan/{id}/skm', [RespondenController::class, 'submitskmpelayanan'])->name('skmpelayanan.submitSkm');
 
+Route::get('/skmtu', [RespondenController::class, 'indextu'])->name('skmtu.welcome');
 Route::get('/skmtu/biodata', [RespondenController::class, 'createskmtu'])->name('skmtu.biodata');
 Route::post('/skmtu/biodata', [RespondenController::class, 'storeskmtu'])->name('skmtu.biodata');
-
 Route::get('/skmtu/{id}/skm', [RespondenController::class, 'skmtu'])->name('skmtu.skm');
 Route::post('/skmtu/{id}/skm', [RespondenController::class, 'submitskmtu'])->name('skmtu.submitSkm');
 

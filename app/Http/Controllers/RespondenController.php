@@ -22,6 +22,11 @@ class RespondenController extends Controller
         //
     }
 
+    public function indextu()
+    {
+        return view('skmtu.welcome');
+    }
+
     public function createskmpelayanan()
     {
         $layanans = Layanan::orderBy('j_layanan')->get();
