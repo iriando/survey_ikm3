@@ -94,19 +94,20 @@ class RespondenController extends Controller
 
     public function storeskmtu(Request $request)
     {
-        $request->validate([
+        $validated =$request->validate([
             'nama' => 'required|string|max:255',
-            'usia' => 'required|string|',
-            'gender' => 'required|string',
-            'nohp' => 'required|string|max:255',
-            'pendidikan' => 'required|string',
-            'pekerjaan' => 'required|string',
-            'instansi' => 'string|nullable',
             'j_layanantu' => 'required|string',
-            'jabatan' => 'string|nullable',
         ]);
 
-        $responden = Responden::create($request->all());
+        $responden = Responden::create([
+            'nama' => $validated['nama'],
+            'j_layanantu' => $validated['j_layanantu'],
+            'usia' => 0,
+            'gender' => 0,
+            'nohp' => 0,
+            'pendidikan' => 0,
+            'pekerjaan' => 'Pegawai negeri sipil',
+        ]);
 
         return redirect()->route('skmtu.skm', ['id' => $responden->id])->with('success', 'Data berhasil disimpan!');
     }

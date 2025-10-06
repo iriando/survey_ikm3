@@ -33,18 +33,6 @@ class ListRespondenSkmTu extends ListRecords
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('usia')
-                    ->label('Usia'),
-                Tables\Columns\TextColumn::make('gender')
-                    ->label('Jenis Kelamin'),
-                Tables\Columns\TextColumn::make('nohp')
-                    ->label('No. HP'),
-                Tables\Columns\TextColumn::make('pendidikan')
-                    ->label('Pendidikan'),
-                Tables\Columns\TextColumn::make('pekerjaan')
-                    ->label('Pekerjaan')->searchable(),
-                Tables\Columns\TextColumn::make('instansi')
-                    ->label('Instansi')->searchable(),
                 Tables\Columns\TextColumn::make('j_layanantu')
                     ->label('Jenis layanan')->searchable(),
                 Tables\Columns\TextColumn::make('kritik_saran')

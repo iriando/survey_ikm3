@@ -91,49 +91,6 @@ class Laporanikmtu extends Page implements Tables\Contracts\HasTable
         return Pertanyaanikmtu::all();
     }
 
-    public function getGenderCount()
-    {
-        $query = Responden::query()
-            ->whereNotNull('j_layanantu')
-            ->whereHas('jawabansurvey');;
-
-        if ($this->tanggalMulai) {
-            $query->whereDate('created_at', '>=', $this->tanggalMulai);
-        }
-        if ($this->tanggalAkhir) {
-            $query->whereDate('created_at', '<=', $this->tanggalAkhir);
-        }
-        if ($this->jenisLayanan) {
-            $query->where('j_layanantu', $this->jenisLayanan);
-        }
-
-        return $query->select('gender', DB::raw('count(*) as total'))
-            ->groupBy('gender')
-            ->get();
-    }
-
-    public function getPendidikanCount()
-    {
-        $query = Responden::query()
-            ->whereNotNull('j_layanantu')
-            ->whereHas('jawabansurvey');
-
-        if ($this->tanggalMulai) {
-            $query->whereDate('created_at', '>=', $this->tanggalMulai);
-        }
-        if ($this->tanggalAkhir) {
-            $query->whereDate('created_at', '<=', $this->tanggalAkhir);
-        }
-        if ($this->jenisLayanan) {
-            $query->where('j_layanantu', $this->jenisLayanan);
-        }
-
-        return $query->select('pendidikan', DB::raw('count(*) as total'))
-            ->groupBy('pendidikan')
-            ->orderBy('pendidikan', 'asc')
-            ->get();
-    }
-
     public function getTotalPerParameter()
     {
         $query = DB::table('responden_ikms')
@@ -265,17 +222,6 @@ class Laporanikmtu extends Page implements Tables\Contracts\HasTable
                     ->label('Nama Responden')
                     ->sortable()
                     ->searchable(),
-
-                TextColumn::make('responden.usia')
-                    ->label('Usia')
-                    ->sortable(),
-
-                BadgeColumn::make('responden.gender')
-                    ->label('Gender')
-                    ->colors([
-                        'success' => 'Laki-laki',
-                        'danger' => 'Perempuan',
-                    ]),
 
                 TextColumn::make('kd_unsur')->label('Kode Unsur')->sortable(),
                 TextColumn::make('skor')->label('Skor')->sortable(),

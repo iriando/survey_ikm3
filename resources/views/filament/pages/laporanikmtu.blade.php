@@ -39,46 +39,6 @@
     </x-filament::card>
 
     <x-filament::card>
-        <h2 class="text-lg font-bold mb-4">Laporan Jumlah Responden Berdasarkan Gender</h2>
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2">Gender</th>
-                    <th class="border border-gray-300 px-4 py-2">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($this->getGenderCount() as $data)
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2">{{ $data->gender }}</td>
-                        <td class="border border-gray-300 px-4 py-2 text-center">{{ $data->total }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </x-filament::card>
-
-    <x-filament::card>
-        <h2 class="text-lg font-bold mb-4">Laporan Jumlah Responden Berdasarkan Pendidikan</h2>
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2">Pendidikan</th>
-                    <th class="border border-gray-300 px-4 py-2">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($this->getPendidikanCount() as $data)
-                    <tr>
-                        <td class="border border-gray-300 px-4 py-2">{{ $data->pendidikan }}</td>
-                        <td class="border border-gray-300 px-4 py-2 text-center">{{ $data->total }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </x-filament::card>
-
-    <x-filament::card>
         <h2 class="text-lg font-bold mt-8 mb-4">Total Skor</h2>
         <table class="w-full border-collapse border border-gray-300">
             <thead>
