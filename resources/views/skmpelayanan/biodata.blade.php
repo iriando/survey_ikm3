@@ -118,6 +118,7 @@
                             <label class="form-label">Jabatan</label>
                             <select name="jabatan" id="jabatan" class="form-select">
                                 <option value="" selected disabled>Pilih Jabatan</option>
+                                <option value="" selected disabled>Pilih Jabatan</option>
                                 <option value="Jabatan Pimpinan Tinggi">Jabatan Pimpinan Tinggi</option>
                                 <option value="Administrator">Administrator</option>
                                 <option value="Pengawas">Pengawas</option>
@@ -131,6 +132,7 @@
                             <label class="form-label">Instansi</label>
                             <select name="instansi" id="instansi" class="form-select">
                                 <option value="" selected disabled>Pilih Instansi</option>
+                                <option value="" selected disabled>Pilih Instansi</option>
                                 @foreach($instansi as $instansi)
                                     <option value="{{ $instansi->nama_instansi }}">{{ $instansi->nama_instansi }}</option>
                                 @endforeach
@@ -141,7 +143,7 @@
                         <div class="col-md-6">
                             <label class="form-label">Jenis Layanan</label>
                             <select name="j_layanan" class="form-select" required>
-                                <option selected disabled>Pilih Jenis Layanan</option>
+                                <option value="" selected disabled>Pilih Jenis Layanan</option>
                                 @foreach($layanans as $layanan)
                                     <option value="{{ $layanan->j_layanan }}">{{ $layanan->j_layanan }}</option>
                                 @endforeach

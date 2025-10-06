@@ -85,6 +85,7 @@ class RespondenResource extends Resource
             'index' => Pages\ListRespondens::route('/'),
             'respondenskmpembinaan' => Pages\ListRespondenSkmPembinaan::route('/respondenskmpembinaan'),
             'respondenskmpelayanan' => Pages\ListRespondenSkmPelayanan::route('/respondenskmpelayanan'),
+            'respondenskmtu' => Pages\ListRespondenSkmTu::route('/respondenskmtu'),
             // 'create' => Pages\CreateResponden::route('/create'),
             // 'edit' => Pages\EditResponden::route('/{record}/edit'),
         ];
@@ -101,6 +102,10 @@ class RespondenResource extends Resource
                 ->url(static::getUrl('respondenskmpelayanan'))
                 ->icon('heroicon-o-user')
                 ->group('IKM Pelayanan'),
+            NavigationItem::make('Responden')
+                ->url(static::getUrl('respondenskmtu'))
+                ->icon('heroicon-o-user')
+                ->group('IKM Bagian Tata Usaha'),
         ];
     }
 
