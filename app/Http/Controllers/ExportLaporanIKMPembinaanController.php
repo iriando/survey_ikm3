@@ -65,7 +65,7 @@ class ExportLaporanIkmPembinaanController extends Controller
         foreach ($dataResponden as $row) {
             for ($i = 1; $i <= $maxUnsur; $i++) {
                 $key = 'P' . $i;
-                $val = (int)($row[$key] ?? 0);
+                $val = (float)($row[$key] ?? 0);
                 $totals[$key] = ($totals[$key] ?? 0) + $val;
                 $counts[$key] = ($counts[$key] ?? 0) + 1;
             }
@@ -115,7 +115,7 @@ class ExportLaporanIkmPembinaanController extends Controller
             $data = ['id_biodata' => $row->id_biodata];
             for ($i = 1; $i <= 10; $i++) {
                 $kd = 'P' . $i;
-                $data[$kd] = property_exists($row, $kd) ? (int)$row->$kd : 0;
+                $data[$kd] = property_exists($row, $kd) ? (float)$row->$kd : 0;
             }
             $result[] = $data;
         }

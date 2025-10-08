@@ -13,6 +13,7 @@ use App\Models\RespondenIkm;
 use Illuminate\Http\Request;
 use App\Models\Pertanyaanikmtu;
 use App\Models\Pertanyaanikmpelayanan;
+use App\Models\Pilihan_jawaban;
 use App\Models\Pilihan_jawabanikmpelayanan;
 
 class RespondenController extends Controller
@@ -143,12 +144,13 @@ class RespondenController extends Controller
             'narasumber_id' => 'required|exists:narasumbers,id',
         ]);
 
-        foreach ($request->jawaban as $kd_unsur => $skor) {
+        foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
+            $pilihan = Pilihan_jawaban::find($pilihan_id);
             RespondenIkm::create([
                 'id_biodata' => $id,
                 'kd_unsurikmpembinaan' => $kd_unsur,
                 'narasumber_id' => $request->narasumber_id,
-                'skor' => $skor,
+                'skor' => $pilihan?->bobot ?? 0,
             ]);
         }
 

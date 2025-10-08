@@ -11,7 +11,7 @@
                         <h4>Formulir</h4>
                         <div class="services-list">
                             <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Isi biodata</span></a>
-                            <a href="#" class="active"><i class="bi bi-arrow-right-circle"></i><span>Isi survey IKM</span></a>
+                            <a href="#" class="active"><i class="bi bi-arrow-right-circle"></i><span>Isi survey IKM Pelayanan</span></a>
                         </div>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                                         <p><strong>{{ $pertanyaan->teks_pertanyaan }}</strong></p>
                                         @foreach($pertanyaan->pilihanJawabans as $index => $jawaban)
                                         <div class="form-check-inline mb-2">
-                                            <input class="btn-check" type="radio"id="{{ $pertanyaan->unsur->kd_unsur }}_{{ $index }}"name="jawaban[{{ $pertanyaan->unsur->kd_unsur }}]"value="{{ $jawaban->id }}"requiredautocomplete="off">
+                                            <input class="btn-check" type="radio"id="{{ $pertanyaan->unsur->kd_unsur }}_{{ $index }}"name="jawaban[{{ $pertanyaan->unsur->kd_unsur }}]"value="{{ $jawaban->id }}"required autocomplete="off">
                                             <label for="{{ $pertanyaan->unsur->kd_unsur }}_{{ $index }}"class="btn btn-primary">{{ $jawaban->teks_pilihan }}</label>
                                         </div>
                                         @endforeach
