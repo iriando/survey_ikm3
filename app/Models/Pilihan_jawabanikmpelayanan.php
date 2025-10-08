@@ -12,6 +12,7 @@ class Pilihan_jawabanikmpelayanan extends Model
         'pertanyaan_id',
         'teks_pilihan',
         'np',
+        'bobot',
         'mutu',
     ];
 

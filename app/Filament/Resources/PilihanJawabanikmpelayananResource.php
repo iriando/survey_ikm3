@@ -46,9 +46,15 @@ class PilihanJawabanikmpelayananResource extends Resource
                     )
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set) {
-                        $mutu = NilaiPersepsiIkm::where('np', $state)->first()?->mutu_pelayanan;
+                        $mutu = \App\Models\NilaiPersepsiIkm::where('np', $state)->first()?->mutu_pelayanan;
+                        $ni_terendah = \App\Models\NilaiPersepsiIkm::where('np', $state)->first()?->ni_terendah;
+                        $ni_tertinggi = \App\Models\NilaiPersepsiIkm::where('np', $state)->first()?->ni_tertinggi;
+
                         if ($mutu) {
                             $set('mutu', $mutu);
+                        }
+                        if ($ni_terendah !== null && $ni_tertinggi !== null) {
+                            $set('bobot', round(($ni_terendah + $ni_tertinggi) / 2, 2));
                         }
                     })
                     ->required()
@@ -58,6 +64,37 @@ class PilihanJawabanikmpelayananResource extends Resource
                     ->readOnly()
                     ->required()
                     ->disabled(),
+
+                Forms\Components\TextInput::make('bobot')
+                    ->label('Bobot')
+                    ->numeric()
+                    ->step(0.01)
+                    ->reactive()
+                    ->required()
+                    ->minValue(function (callable $get) {
+                        $np = $get('np');
+                        if ($np) {
+                            return \App\Models\NilaiPersepsiIkm::where('np', $np)->first()?->ni_terendah ?? 0;
+                        }
+                        return 0;
+                    })
+                    ->maxValue(function (callable $get) {
+                        $np = $get('np');
+                            if ($np) {
+                                return \App\Models\NilaiPersepsiIkm::where('np', $np)->first()?->ni_tertinggi ?? 5;
+                            }
+                            return 5;
+                        })
+                    ->hint(function (callable $get) {
+                        $np = $get('np');
+                        if ($np) {
+                            $data = \App\Models\NilaiPersepsiIkm::where('np', $np)->first();
+                            if ($data) {
+                                return "Rentang: {$data->ni_terendah} - {$data->ni_tertinggi}";
+                            }
+                        }
+                        return null;
+                    }),
             ]);
     }
 
@@ -73,6 +110,8 @@ class PilihanJawabanikmpelayananResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('np')
                     ->label('Nilai Persepsi'),
+                Tables\Columns\TextColumn::make('bobot')
+                    ->label('Bobot jawaban'),
                 Tables\Columns\TextColumn::make('mutu')
                     ->label('Mutu'),
             ])

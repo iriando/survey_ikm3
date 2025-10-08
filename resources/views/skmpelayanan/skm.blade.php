@@ -33,7 +33,7 @@
                                         <p><strong>{{ $pertanyaan->teks_pertanyaan }}</strong></p>
                                         @foreach($pertanyaan->pilihanJawabans as $index => $jawaban)
                                         <div class="form-check-inline mb-2">
-                                            <input class="btn-check" type="radio"id="{{ $pertanyaan->unsur->kd_unsur }}_{{ $index }}"name="jawaban[{{ $pertanyaan->unsur->kd_unsur }}]"value="{{ $jawaban->np }}"requiredautocomplete="off">
+                                            <input class="btn-check" type="radio"id="{{ $pertanyaan->unsur->kd_unsur }}_{{ $index }}"name="jawaban[{{ $pertanyaan->unsur->kd_unsur }}]"value="{{ $jawaban->id }}"requiredautocomplete="off">
                                             <label for="{{ $pertanyaan->unsur->kd_unsur }}_{{ $index }}"class="btn btn-primary">{{ $jawaban->teks_pilihan }}</label>
                                         </div>
                                         @endforeach

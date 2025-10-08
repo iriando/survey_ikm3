@@ -55,36 +55,67 @@ class UnsurikmpelayananResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('teks_pilihan')
                                     ->label('Teks Pilihan')
-                                    ->required(),
+                                    ->required()
+                                    ->columnSpanFull(),
 
-                                Forms\Components\Select::make('np')
-                                    ->label('Nilai Persepsi (NP)')
-                                    ->options(
-                                        \App\Models\NilaiPersepsiIkm::orderByDesc('np')->pluck('np', 'np')
-                                    )
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set) {
-                                        $mutu = \App\Models\NilaiPersepsiIkm::where('np', $state)->first()?->mutu_pelayanan;
-                                        if ($mutu) {
-                                            $set('mutu', $mutu);
-                                        }
-                                    })
-                                    ->required(),
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\Select::make('np')
+                                            ->label('Nilai Persepsi')
+                                            ->options(
+                                                \App\Models\NilaiPersepsiIkm::orderByDesc('np')->pluck('np', 'np')
+                                            )
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, callable $set) {
+                                                $data = \App\Models\NilaiPersepsiIkm::where('np', $state)->first();
+                                                if ($data) {
+                                                    $set('mutu', $data->mutu_pelayanan);
+                                                    $set('bobot', round(($data->ni_terendah + $data->ni_tertinggi) / 2, 2));
+                                                }
+                                            })
+                                            ->required(),
 
-                                Forms\Components\TextInput::make('mutu')
-                                    ->label('Mutu')
-                                    ->readOnly()
-                                    ->required(),
+                                        Forms\Components\TextInput::make('mutu')
+                                            ->label('Mutu')
+                                            ->readOnly()
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('bobot')
+                                            ->label('Bobot')
+                                            ->numeric()
+                                            ->step(0.01)
+                                            ->reactive()
+                                            ->required()
+                                            ->minValue(function (callable $get) {
+                                                $np = $get('np');
+                                                if ($np) {
+                                                    return \App\Models\NilaiPersepsiIkm::where('np', $np)->first()?->ni_terendah ?? 0;
+                                                }
+                                                return 0;
+                                            })
+                                            ->maxValue(function (callable $get) {
+                                                $np = $get('np');
+                                                if ($np) {
+                                                    return \App\Models\NilaiPersepsiIkm::where('np', $np)->first()?->ni_tertinggi ?? 5;
+                                                }
+                                                return 5;
+                                            })
+                                            ->hint(function (callable $get) {
+                                                $np = $get('np');
+                                                if ($np) {
+                                                    $data = \App\Models\NilaiPersepsiIkm::where('np', $np)->first();
+                                                    if ($data) {
+                                                        return "{$data->ni_terendah} - {$data->ni_tertinggi}";
+                                                    }
+                                                }
+                                                return null;
+                                            }),
+                                    ])
+                                    ->columns(3), // <-- ini yang bikin sejajar dalam satu baris
                             ])
-                            ->minItems(
-                                \App\Models\NilaiPersepsiIkm::count()
-                            )
-                            ->maxItems(
-                                \App\Models\NilaiPersepsiIkm::count()
-                            )
-                            ->defaultItems(
-                                \App\Models\NilaiPersepsiIkm::count()
-                            )
+                            ->minItems(\App\Models\NilaiPersepsiIkm::count())
+                            ->maxItems(\App\Models\NilaiPersepsiIkm::count())
+                            ->defaultItems(\App\Models\NilaiPersepsiIkm::count())
                             ->grid(2)
                             ->reorderable(false),
                     ])

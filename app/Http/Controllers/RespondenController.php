@@ -13,6 +13,7 @@ use App\Models\RespondenIkm;
 use Illuminate\Http\Request;
 use App\Models\Pertanyaanikmtu;
 use App\Models\Pertanyaanikmpelayanan;
+use App\Models\Pilihan_jawabanikmpelayanan;
 
 class RespondenController extends Controller
 {
@@ -161,16 +162,19 @@ class RespondenController extends Controller
             'jawaban' => 'required|array',
         ]);
 
-        foreach ($request->jawaban as $kd_unsur => $skor) {
+        foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
+            $pilihan = Pilihan_jawabanikmpelayanan::find($pilihan_id);
+
             RespondenIkm::create([
                 'id_biodata' => $id,
                 'kd_unsurikmpelayanan' => $kd_unsur,
-                'skor' => $skor,
+                'skor' => $pilihan?->bobot ?? 0,
             ]);
         }
 
         return redirect()->route('kritik-saran.form', $id);
     }
+
 
     public function submitskmtu(Request $request, $id)
     {
