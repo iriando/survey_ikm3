@@ -131,47 +131,13 @@ class Laporanikmpembinaan extends Page
         $query = DB::table('responden_ikms')
             ->whereNotNull('kegiatan')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->select('kd_unsurikmpembinaan', DB::raw("ROUND(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"));
+            ->select('kd_unsurikmpembinaan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"));
 
         if ($this->kegiatan) {
             $query->where('respondens.kegiatan', $this->kegiatan);
         }
         return $query->groupBy('kd_unsurikmpembinaan')->get();
     }
-
-    // public function getIkm()
-    // {
-    //     $totalParameter = Pertanyaan::count();
-    //     $totalNp = NilaiPersepsiIkm::count();
-
-    //     if ($totalParameter === 0 || $totalNp === 0) {
-    //         return null;
-    //     }
-
-    //     $konversi = 100 / $totalNp;
-    //     $bobot = 1 / $totalParameter;
-
-    //     $query = DB::table('responden_ikms')
-    //         ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-    //         ->whereNotNull('respondens.kegiatan');
-
-    //     if ($this->kegiatan) {
-    //         $query->where('respondens.kegiatan', $this->kegiatan);
-    //     }
-
-    //     // Hitung total skor dan total responden unik
-    //     $totalSkor = $query->sum('skor');
-    //     // $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
-    //     $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
-
-    //     if ($totalResponden === 0) {
-    //         return 0;
-    //     }
-
-    //     $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
-
-    //     return round($ikm, 2);
-    // }
 
     public function getIkm()
     {
@@ -187,24 +153,23 @@ class Laporanikmpembinaan extends Page
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->select('kd_unsurikmpembinaan', DB::raw('AVG(skor) as rata_skor'));
+            ->whereNotNull('respondens.kegiatan');
 
         if ($this->kegiatan) {
             $query->where('respondens.kegiatan', $this->kegiatan);
         }
 
-        $nrrPerParameter = $query->groupBy('kd_unsurikmpembinaan')->pluck('rata_skor');
+        // Hitung total skor dan total responden unik
+        $totalSkor = $query->sum('skor');
+        // $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
+        $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
 
-        if ($nrrPerParameter->isEmpty()) {
+        if ($totalResponden === 0) {
             return 0;
         }
 
-        $totalNilai = 0;
-        foreach ($nrrPerParameter as $nrr) {
-            $totalNilai += $nrr * $bobot;
-        }
+        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
 
-        $ikm = $totalNilai * $konversi;
         return round($ikm, 2);
     }
 
