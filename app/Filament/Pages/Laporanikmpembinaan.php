@@ -131,7 +131,7 @@ class Laporanikmpembinaan extends Page
         $query = DB::table('responden_ikms')
             ->whereNotNull('kegiatan')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->select('kd_unsurikmpembinaan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"));
+            ->select('kd_unsurikmpembinaan', DB::raw('ROUND(AVG(skor), 2) as avg_skor'));
 
         if ($this->kegiatan) {
             $query->where('respondens.kegiatan', $this->kegiatan);
@@ -139,45 +139,9 @@ class Laporanikmpembinaan extends Page
         return $query->groupBy('kd_unsurikmpembinaan')->get();
     }
 
-    // public function getIkm()
-    // {
-    //     $totalParameter = Pertanyaan::count();
-    //     $totalNp = NilaiPersepsiIkm::count();
-
-    //     if ($totalParameter === 0 || $totalNp === 0) {
-    //         return null;
-    //     }
-
-    //     $konversi = 100 / $totalNp;
-    //     $bobot = 1 / $totalParameter;
-
-    //     $query = DB::table('responden_ikms')
-    //         ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-    //         ->whereNotNull('respondens.kegiatan');
-
-    //     if ($this->kegiatan) {
-    //         $query->where('respondens.kegiatan', $this->kegiatan);
-    //     }
-
-    //     // Hitung total skor dan total responden unik
-    //     $totalSkor = $query->sum('skor');
-    //     // $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
-    //     $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
-
-    //     if ($totalResponden === 0) {
-    //         return 0;
-    //     }
-
-    //     $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
-
-    //     return round($ikm, 2);
-    // }
-
     public function getIkm()
     {
-        // Hitung jumlah parameter (unsur)
         $totalParameter = Pertanyaan::count();
-        // Hitung jumlah nilai persepsi (skala, misal 4 atau 5)
         $totalNp = NilaiPersepsiIkm::count();
 
         if ($totalParameter === 0 || $totalNp === 0) {
@@ -185,32 +149,23 @@ class Laporanikmpembinaan extends Page
         }
 
         $konversi = 100 / $totalNp;
+        $bobot = 1 / $totalParameter;
 
-        // Ambil rata-rata skor (NRR) per parameter
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.kegiatan')
-            ->select('kd_unsurikmpembinaan', DB::raw('AVG(skor) as rata_skor'));
+            ->whereNotNull('respondens.kegiatan');
 
         if ($this->kegiatan) {
             $query->where('respondens.kegiatan', $this->kegiatan);
         }
 
-        $nrrPerParameter = $query->groupBy('kd_unsurikmpembinaan')->pluck('rata_skor');
+        $nrrRata = $query
+            ->select(DB::raw('AVG(skor) as rata_skor'))
+            ->value('rata_skor');
 
-        if ($nrrPerParameter->isEmpty()) {
-            return 0;
-        }
-
-        // Hitung NRR rata-rata dari semua unsur
-        $nrrRata = $nrrPerParameter->avg();
-
-        // Hitung IKM (rata-rata NRR × konversi)
         $ikm = $nrrRata * $konversi;
-
         return round($ikm, 2);
     }
-
 
 
     protected function getHeaderActions(): array

@@ -153,21 +153,24 @@ class ExportLaporanIkmPembinaanController extends Controller
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.kegiatan');
+            ->select('kd_unsurikmpembinaan', DB::raw('AVG(skor) as rata_skor'));
 
         if ($kegiatanNama) {
             $query->where('respondens.kegiatan', $kegiatanNama);
         }
 
-        $totalSkor = $query->sum('skor');
-        $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
+        $nrrPerParameter = $query->groupBy('kd_unsurikmpembinaan')->pluck('rata_skor');
 
-        if ($totalResponden === 0) {
+        if ($nrrPerParameter->isEmpty()) {
             return 0;
         }
 
-        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
+        $totalNilai = 0;
+        foreach ($nrrPerParameter as $nrr) {
+            $totalNilai += $nrr * $bobot;
+        }
 
+        $ikm = $totalNilai * $konversi;
         return round($ikm, 2);
     }
 
