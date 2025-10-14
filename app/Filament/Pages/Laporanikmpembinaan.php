@@ -167,9 +167,9 @@ class Laporanikmpembinaan extends Page
         if ($totalResponden === 0) {
             return 0;
         }
-
-        $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
-
+        // $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
+        $nrr = $totalSkor / ($totalResponden * $bobot);
+        $ikm = $nrr * $konversi;
         return round($ikm, 2);
     }
 
