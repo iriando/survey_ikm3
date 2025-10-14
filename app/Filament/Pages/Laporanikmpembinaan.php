@@ -149,7 +149,7 @@ class Laporanikmpembinaan extends Page
         }
 
         $konversi = 100 / $totalNp;
-        $bobot = 1 / $totalParameter;
+        // $bobot = 1 / $totalParameter;
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
@@ -168,7 +168,7 @@ class Laporanikmpembinaan extends Page
             return 0;
         }
         // $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
-        $nrr = $totalSkor / ($totalResponden * $bobot);
+        $nrr = $totalSkor / ($totalResponden * $totalParameter);
         $ikm = $nrr * $konversi;
         return round($ikm, 2);
     }
