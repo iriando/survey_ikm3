@@ -13,6 +13,7 @@
             <table class="w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200">
+                        <th class="border border-gray-300 px-4 py-2 w-12 text-center">No</th>
                         <th class="border border-gray-300 px-4 py-2">Nama Responden</th>
                         @foreach($this->getPertanyaan() as $p)
                             <th class="border border-gray-300 px-4 py-2">{{ $p->unsur->kd_unsur }}</th>
@@ -23,6 +24,7 @@
                 <tbody>
                     @foreach($this->getDataResponden() as $responden)
                         <tr>
+                            <td class="border border-gray-300 px-4 py-2 text-center">{{ $loop->iteration }}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $responden->nama_responden }}</td>
                             @foreach($this->getPertanyaan() as $p)
                                 <td class="border border-gray-300 px-4 py-2 text-center">

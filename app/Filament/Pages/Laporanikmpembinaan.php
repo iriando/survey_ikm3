@@ -161,7 +161,8 @@ class Laporanikmpembinaan extends Page
 
         // Hitung total skor dan total responden unik
         $totalSkor = $query->sum('skor');
-        $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
+        // $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
+        $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
 
         if ($totalResponden === 0) {
             return 0;
