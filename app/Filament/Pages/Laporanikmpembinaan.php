@@ -149,7 +149,6 @@ class Laporanikmpembinaan extends Page
         }
 
         $konversi = 100 / $totalNp;
-        // $bobot = 1 / $totalParameter;
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
@@ -159,19 +158,22 @@ class Laporanikmpembinaan extends Page
             $query->where('respondens.kegiatan', $this->kegiatan);
         }
 
-        // Hitung total skor dan total responden unik
         $totalSkor = $query->sum('skor');
-        // $totalResponden = $query->distinct('id_biodata')->count('id_biodata');
         $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
 
         if ($totalResponden === 0) {
             return 0;
         }
-        // $ikm = ($totalSkor / $totalResponden) * $bobot * $konversi;
+
+        // rata-rata skor (1–4)
         $nrr = $totalSkor / ($totalResponden * $totalParameter);
+
+        // Konversi ke skala 100
         $ikm = $nrr * $konversi;
+
         return round($ikm, 2);
     }
+
 
     protected function getHeaderActions(): array
     {
