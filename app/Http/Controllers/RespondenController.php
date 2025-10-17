@@ -117,6 +117,13 @@ class RespondenController extends Controller
     public function skmpembinaan($id)
     {
         $responden = Responden::findOrFail($id);
+        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+            ->whereNotNull('kd_unsurikmpembinaan')
+            ->exists();
+        if ($sudahIsi) {
+            return redirect()->route('kritik-saran.form', $id)
+                ->with('warning', 'Anda sudah pernah mengisi survei pembinaan ini.');
+        }
         $pertanyaans = Pertanyaan::with('pilihanJawabans', 'unsur')->get();
         return view('skmpembinaan.skm', compact('responden', 'pertanyaans'));
     }
@@ -124,8 +131,14 @@ class RespondenController extends Controller
     public function skmpelayanan($id)
     {
         $responden = Responden::findOrFail($id);
+        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+            ->whereNotNull('kd_unsurikmpelayanan')
+            ->exists();
+        if ($sudahIsi) {
+            return redirect()->route('kritik-saran.form', $id)
+                ->with('warning', 'Anda sudah pernah mengisi survei pelayanan ini.');
+        }
         $pertanyaans = Pertanyaanikmpelayanan::with('pilihanJawabans', 'unsur')->get();
-
         return view('skmpelayanan.skm', compact('responden', 'pertanyaans'));
     }
 
@@ -143,7 +156,13 @@ class RespondenController extends Controller
             'jawaban' => 'required|array',
             'narasumber_id' => 'required|exists:narasumbers,id',
         ]);
-
+        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+            ->whereNotNull('kd_unsurikmpembinaan')
+            ->exists();
+        if ($sudahIsi) {
+            return redirect()->route('kritik-saran.form', $id)
+                ->with('warning', 'Data survei Anda sudah tersimpan sebelumnya.');
+        }
         foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
             $pilihan = Pilihan_jawaban::find($pilihan_id);
             RespondenIkm::create([
@@ -153,7 +172,6 @@ class RespondenController extends Controller
                 'skor' => $pilihan?->bobot ?? 0,
             ]);
         }
-
         return redirect()->route('kritik-saran.form', $id);
     }
 
@@ -163,17 +181,22 @@ class RespondenController extends Controller
         $request->validate([
             'jawaban' => 'required|array',
         ]);
+        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+            ->whereNotNull('kd_unsurikmpelayanan')
+            ->exists();
 
+        if ($sudahIsi) {
+            return redirect()->route('kritik-saran.form', $id)
+                ->with('warning', 'Data survei Anda sudah tersimpan sebelumnya.');
+        }
         foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
             $pilihan = Pilihan_jawabanikmpelayanan::find($pilihan_id);
-
             RespondenIkm::create([
                 'id_biodata' => $id,
                 'kd_unsurikmpelayanan' => $kd_unsur,
                 'skor' => $pilihan?->bobot ?? 0,
             ]);
         }
-
         return redirect()->route('kritik-saran.form', $id);
     }
 

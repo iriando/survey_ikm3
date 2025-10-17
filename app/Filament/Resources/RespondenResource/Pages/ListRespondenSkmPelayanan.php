@@ -48,6 +48,7 @@ class ListRespondenSkmPelayanan extends ListRecords
                     ->label('Instansi')->searchable(),
                 Tables\Columns\TextColumn::make('j_layanan')
                     ->label('Jenis layanan')->searchable(),
+                Tables\Columns\TextColumn::make('jawabansurvey.skor')->label('Skor')->searchable(),
                 Tables\Columns\TextColumn::make('kritik_saran')
                     ->label('Kritik & Saran'),
                 Tables\Columns\TextColumn::make('created_at')

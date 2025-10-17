@@ -38,6 +38,7 @@ class ListRespondenSkmPembinaan extends ListRecords
                 Tables\Columns\TextColumn::make('jabatan')->label('Jabatan')->searchable(),
                 Tables\Columns\TextColumn::make('instansi')->label('Instansi')->searchable(),
                 Tables\Columns\TextColumn::make('kegiatan')->label('Kegiatan')->searchable(),
+                Tables\Columns\TextColumn::make('jawabansurvey.skor')->label('Skor')->searchable(),
                 Tables\Columns\TextColumn::make('kritik_saran')->label('Kritik & Saran'),
                 Tables\Columns\TextColumn::make('created_at')->label('Tanggal Isi')->date('d/m/Y'),
             ])
@@ -82,7 +83,7 @@ class ListRespondenSkmPembinaan extends ListRecords
                     ->label('Kegiatan')
                     ->options(
                         Responden::query()
-                            ->whereNotNull('kegiatan') // biar tidak ada null yang bikin error
+                            ->whereNotNull('kegiatan')
                             ->select('kegiatan')
                             ->distinct()
                             ->pluck('kegiatan', 'kegiatan')

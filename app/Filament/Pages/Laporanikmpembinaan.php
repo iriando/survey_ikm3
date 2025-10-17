@@ -165,10 +165,7 @@ class Laporanikmpembinaan extends Page
             return 0;
         }
 
-        // rata-rata skor (1–4)
         $nrr = $totalSkor / ($totalResponden * $totalParameter);
-
-        // Konversi ke skala 100
         $ikm = $nrr * $konversi;
 
         return round($ikm, 2);
