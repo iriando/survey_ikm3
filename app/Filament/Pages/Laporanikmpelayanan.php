@@ -15,15 +15,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 {
-    use Tables\Concerns\InteractsWithTable;
+    use Tables\Concerns\InteractsWithTable, HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.pages.laporanikmpelayanan';
     protected static ?string $navigationGroup = 'IKM Pelayanan';
-    protected static ?string $title = 'Laporan';
+    protected static ?string $title = 'Laporan IKM Pelayanan';
 
     public ?string $layanan = null;
     public ?string $tanggalMulai = null;

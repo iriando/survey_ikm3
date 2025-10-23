@@ -93,20 +93,54 @@ class RespondenResource extends Resource
 
     public static function getNavigationItems(): array
     {
-        return [
-            NavigationItem::make('Responden')
+        $user = auth()->user();
+
+        $items = [];
+
+        // Admin Pembinaan
+        if ($user && $user->hasRole('admin pembinaan')) {
+            $items[] = NavigationItem::make('Responden')
                 ->url(static::getUrl('respondenskmpembinaan'))
                 ->icon('heroicon-o-user')
-                ->group('IKM Pembinaan'),
-            NavigationItem::make('Responden')
+                ->group('IKM Pembinaan');
+        }
+
+        // Admin Pelayanan
+        if ($user && $user->hasRole('admin pelayanan')) {
+            $items[] = NavigationItem::make('Responden')
                 ->url(static::getUrl('respondenskmpelayanan'))
                 ->icon('heroicon-o-user')
-                ->group('IKM Pelayanan'),
-            NavigationItem::make('Responden')
+                ->group('IKM Pelayanan');
+        }
+
+        // Admin TU
+        if ($user && $user->hasRole('admin bagian tata usaha')) {
+            $items[] = NavigationItem::make('Responden')
                 ->url(static::getUrl('respondenskmtu'))
                 ->icon('heroicon-o-user')
-                ->group('IKM Bagian Tata Usaha'),
-        ];
+                ->group('IKM Bagian Tata Usaha');
+        }
+
+        // Super Admin bisa lihat semuanya
+        if ($user && $user->hasRole('super_admin')) {
+            $items = [
+                NavigationItem::make('Responden')
+                    ->url(static::getUrl('respondenskmpembinaan'))
+                    ->icon('heroicon-o-user')
+                    ->group('IKM Pembinaan'),
+                NavigationItem::make('Responden')
+                    ->url(static::getUrl('respondenskmpelayanan'))
+                    ->icon('heroicon-o-user')
+                    ->group('IKM Pelayanan'),
+                NavigationItem::make('Responden')
+                    ->url(static::getUrl('respondenskmtu'))
+                    ->icon('heroicon-o-user')
+                    ->group('IKM Bagian Tata Usaha'),
+            ];
+        }
+
+        return $items;
     }
+
 
 }

@@ -10,7 +10,7 @@ use App\Models\Pertanyaanikmpelayanan;
 use App\Models\Pilihan_jawabanikmpelayanan;
 use PhpOffice\PhpWord\TemplateProcessor;
 
-class ExportLaporanIkmPelayananController extends Controller
+class ExportLaporanIKMPelayananController extends Controller
 {
     public function export(Request $request)
     {

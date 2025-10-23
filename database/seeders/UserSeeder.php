@@ -5,21 +5,25 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+
     public function run(): void
     {
-        User::firstOrCreate(
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+
+        $user = User::firstOrCreate(
             ['email' => 'taufik.iriando@bkn.go.id'],
             [
                 'name' => 'Taufik',
-                'password' => Hash::make('admin123'), // ganti dengan password aman
+                'password' => Hash::make('admin123'),
             ]
         );
+
+        if (! $user->hasRole('admin')) {
+            $user->assignRole($adminRole);
+        }
     }
 }

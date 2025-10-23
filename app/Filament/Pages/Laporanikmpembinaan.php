@@ -16,13 +16,16 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class Laporanikmpembinaan extends Page
 {
+    use HasPageShield;
+
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.pages.laporanikmpembinaan';
     protected static ?string $navigationGroup = 'IKM Pembinaan';
-    protected static ?string $title = 'Laporan';
+    protected static ?string $title = 'Laporan IKM Pembinaan';
 
     public ?string $kegiatan = null;
 
@@ -219,5 +222,4 @@ class Laporanikmpembinaan extends Page
                 ->modalButton('Unduh'),
         ];
     }
-
 }

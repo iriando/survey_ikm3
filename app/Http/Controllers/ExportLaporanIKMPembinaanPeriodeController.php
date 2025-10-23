@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
 use Carbon\Carbon;
 
-class ExportLaporanIkmPembinaanPeriodeController extends Controller
+class ExportLaporanIKMPembinaanPeriodeController extends Controller
 {
     public function export()
     {

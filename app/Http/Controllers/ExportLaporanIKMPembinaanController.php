@@ -10,7 +10,7 @@ use App\Models\Pertanyaan;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
 
-class ExportLaporanIkmPembinaanController extends Controller
+class ExportLaporanIKMPembinaanController extends Controller
 {
     public function export($kegiatanNama)
     {

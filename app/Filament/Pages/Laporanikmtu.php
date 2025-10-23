@@ -8,22 +8,23 @@ use App\Models\Responden;
 use Filament\Tables\Table;
 use App\Models\RespondenIkm;
 use Filament\Actions\Action;
+use App\Models\Pertanyaanikmtu;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
-use App\Models\Pertanyaanikmtu;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class Laporanikmtu extends Page implements Tables\Contracts\HasTable
 {
-    use Tables\Concerns\InteractsWithTable;
+    use Tables\Concerns\InteractsWithTable, HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.pages.laporanikmtu';
     protected static ?string $navigationGroup = 'IKM Bagian Tata Usaha';
-    protected static ?string $title = 'Laporan';
+    protected static ?string $title = 'Laporan IKM Bagian Tata usaha';
 
     public ?string $layanan = null;
     public ?string $tanggalMulai = null;
