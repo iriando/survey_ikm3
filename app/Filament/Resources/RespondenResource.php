@@ -83,9 +83,9 @@ class RespondenResource extends Resource
     {
         return [
             'index' => Pages\ListRespondens::route('/'),
-            'respondenskmpembinaan' => Pages\ListRespondenSkmPembinaan::route('/respondenskmpembinaan'),
-            'respondenskmpelayanan' => Pages\ListRespondenSkmPelayanan::route('/respondenskmpelayanan'),
-            'respondenskmtu' => Pages\ListRespondenSkmTu::route('/respondenskmtu'),
+            // 'respondenskmpembinaan' => Pages\ListRespondenSkmPembinaan::route('/respondenskmpembinaan'),
+            // 'respondenskmpelayanan' => Pages\ListRespondenSkmPelayanan::route('/respondenskmpelayanan'),
+            // 'respondenskmtu' => Pages\ListRespondenSkmTu::route('/respondenskmtu'),
             // 'create' => Pages\CreateResponden::route('/create'),
             // 'edit' => Pages\EditResponden::route('/{record}/edit'),
         ];
@@ -93,53 +93,7 @@ class RespondenResource extends Resource
 
     public static function getNavigationItems(): array
     {
-        $user = auth()->user();
-
-        $items = [];
-
-        // Admin Pembinaan
-        if ($user && $user->hasRole('admin pembinaan')) {
-            $items[] = NavigationItem::make('Responden')
-                ->url(static::getUrl('respondenskmpembinaan'))
-                ->icon('heroicon-o-user')
-                ->group('IKM Pembinaan');
-        }
-
-        // Admin Pelayanan
-        if ($user && $user->hasRole('admin pelayanan')) {
-            $items[] = NavigationItem::make('Responden')
-                ->url(static::getUrl('respondenskmpelayanan'))
-                ->icon('heroicon-o-user')
-                ->group('IKM Pelayanan');
-        }
-
-        // Admin TU
-        if ($user && $user->hasRole('admin bagian tata usaha')) {
-            $items[] = NavigationItem::make('Responden')
-                ->url(static::getUrl('respondenskmtu'))
-                ->icon('heroicon-o-user')
-                ->group('IKM Bagian Tata Usaha');
-        }
-
-        // Super Admin bisa lihat semuanya
-        if ($user && $user->hasRole('super_admin')) {
-            $items = [
-                NavigationItem::make('Responden')
-                    ->url(static::getUrl('respondenskmpembinaan'))
-                    ->icon('heroicon-o-user')
-                    ->group('IKM Pembinaan'),
-                NavigationItem::make('Responden')
-                    ->url(static::getUrl('respondenskmpelayanan'))
-                    ->icon('heroicon-o-user')
-                    ->group('IKM Pelayanan'),
-                NavigationItem::make('Responden')
-                    ->url(static::getUrl('respondenskmtu'))
-                    ->icon('heroicon-o-user')
-                    ->group('IKM Bagian Tata Usaha'),
-            ];
-        }
-
-        return $items;
+        return[];
     }
 
 

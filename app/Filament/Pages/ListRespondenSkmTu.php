@@ -1,34 +1,43 @@
 <?php
 
-namespace App\Filament\Resources\RespondenResource\Pages;
+namespace App\Filament\Pages;
 
 use Filament\Tables;
+use Filament\Pages\Page;
 use App\Models\Responden;
 use Filament\Tables\Table;
 use Filament\Forms\Components\DatePicker;
-use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\RespondenResource;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
-class ListRespondenSkmTu extends ListRecords
+class ListRespondenSkmTu extends Page implements Tables\Contracts\HasTable
 {
-    protected static string $resource = RespondenResource::class;
+    use Tables\Concerns\InteractsWithTable;
+    use HasPageShield;
+
+    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $navigationGroup = 'IKM Bagian Tata Usaha';
+    protected static ?string $navigationLabel = 'Responden';
+    protected static ?string $slug = 'respondenskmtu';
+
+    protected static string $view = 'filament.pages.list-responden-skm-tu';
 
     public function getTitle(): string
     {
         return 'Responden SKM Tata Usaha';
     }
 
-    public function getTableQuery(): ?Builder
+    public function getQuery(): Builder
     {
-        return RespondenResource::getEloquentQuery()
+        return Responden::getQuery()
             ->whereNotNull('j_layanantu');
     }
 
     public function table(Table $table): Table
     {
         return $table
+            ->query($this->getQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama')
