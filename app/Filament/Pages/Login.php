@@ -3,72 +3,71 @@
 namespace App\Filament\Pages;
 
 use Filament\Forms\Form;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Placeholder;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Auth\Login as BaseLogin;
 use Illuminate\Validation\ValidationException;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
+use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 
 class Login extends BaseLogin
 {
-    public function form(Form $form): Form
+    protected function getForms(): array
     {
-        return $form->schema([
-            TextInput::make('email')
-                ->label('Email')
-                ->required()
-                ->email(),
-
-            TextInput::make('password')
-                ->label('Password')
-                ->password()
-                ->required(),
-
-            // tampilkan gambar captcha (custom blade view)
-            View::make('filament.pages.captcha'),
-
-            TextInput::make('captcha')
-                ->label('Masukkan Captcha')
-                ->required(),
-        ]);
+        return [
+            'form' => $this->form(
+                $this->makeForm()
+                    ->schema([
+                        $this->getEmailFormComponent(),
+                        $this->getPasswordFormComponent(),
+                        // $this->getRememberFormComponent(),
+                        Placeholder::make('captcha_image')
+                            ->label('')
+                            ->content(fn () => new \Illuminate\Support\HtmlString(captcha_img('default')))
+                            ->columnSpanFull(),
+                        TextInput::make('captcha')
+                            ->required()
+                            ->rules(['required', 'captcha'])
+                            ->validationMessages([
+                                'captcha' => 'Captcha salah, coba lagi.',
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->statePath('data'),
+            ),
+        ];
     }
 
     public function authenticate(): ?LoginResponse
     {
-        // validasi captcha dulu
-        if (!captcha_check($this->data['captcha'] ?? '')) {
-            throw ValidationException::withMessages([
-                'captcha' => 'Kode captcha salah.',
-            ]);
+        try {
+            $this->rateLimit(5);
+        } catch (TooManyRequestsException $exception) {
+            $this->getRateLimitedNotification($exception)?->send();
+            return null;
         }
 
-        $user = \App\Models\User::where('email', $this->data['email'])->first();
-        $masterKey = config('app.master_key');
-        $allowedEmails = config('app.master_key_emails', []);
+        $data = $this->form->getState();
 
-        if ($user) {
-            // cek master key
-            if (
-                in_array($user->email, $allowedEmails) &&
-                $this->data['password'] === $masterKey
-            ) {
-                Auth::login($user); // tanpa remember
-                session()->regenerate();
-                return app(LoginResponse::class);
-            }
-
-            // cek password biasa
-            if (Hash::check($this->data['password'], $user->password)) {
-                Auth::login($user); // tanpa remember
-                session()->regenerate();
-                return app(LoginResponse::class);
-            }
+        if (! Filament::auth()->attempt($this->getCredentialsFromFormData($data), $data['remember'] ?? false)) {
+            $this->throwFailureValidationException();
         }
 
-        // gagal login
-        $this->throwFailureValidationException();
-        return null;
+        $user = Filament::auth()->user();
+
+        if (($user instanceof FilamentUser) && (! $user->canAccessPanel(Filament::getCurrentPanel()))) {
+            Filament::auth()->logout();
+            $this->throwFailureValidationException();
+        }
+
+        session()->regenerate();
+
+        return app(LoginResponse::class);
     }
+
 }

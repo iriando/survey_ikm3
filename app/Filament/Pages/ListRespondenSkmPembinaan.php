@@ -102,9 +102,9 @@ class ListRespondenSkmPembinaan extends Page implements Tables\Contracts\HasTabl
                 ]);
         }
 
-    public function getQuery(): Builder
+    protected function getQuery(): Builder
     {
-        return Responden::getQuery()
+        return Responden::query()
             ->whereNotNull('kegiatan')
             ->orderBy('nama', 'asc');
     }
