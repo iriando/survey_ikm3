@@ -12,13 +12,19 @@ use PhpOffice\PhpWord\TemplateProcessor;
 
 class ExportLaporanIKMPembinaanController extends Controller
 {
-    public function export($kegiatanNama)
+    public function export($id)
     {
-        $kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
-        $respondens = Responden::where('kegiatan', $kegiatanNama)->whereHas('jawabansurvey')->get();
+        $kegiatan = Kegiatan::findOrFail($id);
+        $kegiatanNama = $kegiatan->n_kegiatan;
+        $respondens = Responden::where('kegiatan', $kegiatanNama)
+            ->whereHas('jawabansurvey')
+            ->get();
+        //$kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
+        //$respondens = Responden::where('kegiatan', $kegiatanNama)->whereHas('jawabansurvey')->get();
         $jumlah_responden = $respondens->count();
         $tanggal_kegiatan = \Carbon\Carbon::parse($kegiatan->created_at)->translatedFormat('d F Y');
         $ikm = $this->getIkm($kegiatanNama);
+        //$ikm = $this->getIkm($kegiatanNama);
 
         $templatePath = storage_path('app/templates/laporan_ikm_pembinaan_kegiatan.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
@@ -56,8 +62,8 @@ class ExportLaporanIKMPembinaanController extends Controller
             ];
         }
         $templateProcessor->cloneRowAndSetValues('no', $rows);
-
         $dataResponden = $this->getDataRespondenFixed($kegiatanNama);
+        //$dataResponden = $this->getDataRespondenFixed($kegiatanNama);
 
         $totals = [];
         $counts = [];
@@ -81,7 +87,8 @@ class ExportLaporanIKMPembinaanController extends Controller
         $dataResponden[] = $avgRow;
 
         $skmRow = ['id_biodata' => 'Nilai SKM perparameter'];
-        $skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
+        $skmData = $this->getSkmPerParameter($kegiatanNama);
+        //$skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
         for ($i = 1; $i <= $maxUnsur; $i++) {
             $kd = 'P' . $i;
             $skmRow[$kd] = isset($skmData[$kd]) ? $skmData[$kd] : 0;

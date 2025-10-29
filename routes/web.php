@@ -47,7 +47,8 @@ Route::get('/terima-kasih', function () {
     return view('thankyou');
 })->name('terima-kasih');
 
-Route::get('/export/laporan-ikm-pembinaan/{kegiatanNama}', [ExportLaporanIkmPembinaanController::class, 'export'])->name('export.ikm-pembinaan');
+Route::get('/export/ikm-pembinaan/{id}', [ExportLaporanIKMPembinaanController::class, 'export'])
+    ->name('export.ikm-pembinaan');
 
 Route::get('/export/laporan-ikm-pembinaan-periode', [ExportLaporanIkmPembinaanPeriodeController::class, 'export'])->name('export.ikm-pembinaan-periode');
 

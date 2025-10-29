@@ -51,16 +51,24 @@ class Laporanikmpembinaan extends Page
 
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('kegiatan')
-            ->selectRaw('respondens.nama AS nama_responden, ' . collect($pertanyaan)->map(function ($p) {
-                return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
-            })->implode(', ') . ', DATE(responden_ikms.updated_at) as tanggal');
+            ->whereNotNull('respondens.kegiatan')
+            ->selectRaw('
+                respondens.id AS responden_id,
+                respondens.nama AS nama_responden,
+                DATE(responden_ikms.updated_at) AS tanggal,
+                ' . collect($pertanyaan)->map(function ($p) {
+                    return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
+                })->implode(', ')
+            );
 
         if ($this->kegiatan) {
             $query->where('respondens.kegiatan', $this->kegiatan);
         }
 
-        return $query->groupBy('respondens.nama', 'tanggal')->get();
+        return $query
+            ->groupBy('respondens.id', 'respondens.nama', DB::raw('DATE(responden_ikms.updated_at)'))
+            ->orderBy('tanggal')
+            ->get();
     }
 
     public function getPertanyaan()
@@ -180,23 +188,23 @@ class Laporanikmpembinaan extends Page
         return [
             // Tombol untuk export per kegiatan
             Action::make('unduh_per_kegiatan')
-                ->label('perKegiatan')
-                ->color('success')
-                ->icon('heroicon-m-arrow-down-tray')
-                ->form([
-                    Select::make('kegiatan')
-                        ->label('Pilih Kegiatan')
-                        ->options(Kegiatan::orderBy('n_kegiatan')->pluck('n_kegiatan', 'n_kegiatan'))
-                        ->required()
-                        ->searchable(),
-                ])
-                ->action(function (array $data) {
-                    return redirect()->route('export.ikm-pembinaan', [
-                        'kegiatanNama' => $data['kegiatan'],
-                    ]);
-                })
-                ->modalHeading('Pilih Kegiatan')
-                ->modalButton('Unduh'),
+            ->label('Per Kegiatan')
+            ->color('success')
+            ->icon('heroicon-m-arrow-down-tray')
+            ->form([
+                Select::make('kegiatan_id')
+                    ->label('Pilih Kegiatan')
+                    ->options(Kegiatan::orderBy('n_kegiatan')->pluck('n_kegiatan', 'id'))
+                    ->required()
+                    ->searchable(),
+            ])
+            ->action(function (array $data) {
+                return redirect()->route('export.ikm-pembinaan', [
+                    'id' => $data['kegiatan_id'],
+                ]);
+            })
+            ->modalHeading('Pilih Kegiatan')
+            ->modalButton('Unduh'),
 
             // Tombol untuk export per periode
             Action::make('unduh_per_periode')

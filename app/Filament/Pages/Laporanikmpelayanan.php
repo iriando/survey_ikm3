@@ -70,22 +70,48 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         $query = DB::table('responden_ikms')
             ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
             ->whereNotNull('respondens.j_layanan')
-            ->selectRaw('respondens.nama AS nama_responden, ' . collect($pertanyaan)->map(function ($p) {
-                return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
-            })->implode(', ') . ', DATE(responden_ikms.updated_at) as tanggal');
+            ->selectRaw('
+                respondens.id AS responden_id,
+                respondens.nama AS nama_responden,
+                DATE(responden_ikms.updated_at) AS tanggal,
+                ' . collect($pertanyaan)->map(function ($p) {
+                    return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
+                })->implode(', ')
+            );
 
-        if ($this->tanggalMulai) {
-            $query->whereDate('responden_ikms.updated_at', '>=', $this->tanggalMulai);
-        }
-        if ($this->tanggalAkhir) {
-            $query->whereDate('responden_ikms.updated_at', '<=', $this->tanggalAkhir);
-        }
         if ($this->jenisLayanan) {
             $query->where('respondens.j_layanan', $this->jenisLayanan);
         }
 
-        return $query->groupBy('respondens.nama', 'tanggal')->get();
+        return $query
+            ->groupBy('respondens.id', 'respondens.nama', DB::raw('DATE(responden_ikms.updated_at)'))
+            ->orderBy('tanggal')
+            ->get();
     }
+
+    // public function getDataResponden()
+    // {
+    //     $pertanyaan = Pertanyaanikmpelayanan::all();
+
+    //     $query = DB::table('responden_ikms')
+    //         ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+    //         ->whereNotNull('respondens.j_layanan')
+    //         ->selectRaw('respondens.nama AS nama_responden, ' . collect($pertanyaan)->map(function ($p) {
+    //             return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
+    //         })->implode(', ') . ', DATE(responden_ikms.updated_at) as tanggal');
+
+    //     if ($this->tanggalMulai) {
+    //         $query->whereDate('responden_ikms.updated_at', '>=', $this->tanggalMulai);
+    //     }
+    //     if ($this->tanggalAkhir) {
+    //         $query->whereDate('responden_ikms.updated_at', '<=', $this->tanggalAkhir);
+    //     }
+    //     if ($this->jenisLayanan) {
+    //         $query->where('respondens.j_layanan', $this->jenisLayanan);
+    //     }
+
+    //     return $query->groupBy('respondens.nama', 'tanggal')->get();
+    // }
 
     public function getPertanyaan()
     {
