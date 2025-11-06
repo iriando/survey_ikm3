@@ -35,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandname('Admin IKM Kanreg XIV BKN')
+            ->favicon(asset('img/logo_bkn.png'))
             ->login(Login::class)
             ->colors([
                 'primary' => Color::Amber,

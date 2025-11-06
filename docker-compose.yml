@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: laravel_app
+    volumes:
+      - .:/var/www/html:cached
+    working_dir : /var/www/html
+    ports:
+      - "8000:80"
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_DATABASE: db_skmv3
+      DB_USERNAME: iriando
+      DB_PASSWORD: Papa@213670
+    depends_on:
+      - mysql
+      - phpmyadmin
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8
+    container_name: laravel_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: db_skmv3
+      MYSQL_USER: iriando
+      MYSQL_PASSWORD: Papa@213670
+    command: --lower_case_table_names=2
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - laravel
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: laravel_phpmyadmin
+    restart: always
+    ports:
+      - "8001:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+networks:
+  laravel:
+
+volumes:
+  mysql-data:
