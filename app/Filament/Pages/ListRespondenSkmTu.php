@@ -28,10 +28,11 @@ class ListRespondenSkmTu extends Page implements Tables\Contracts\HasTable
         return 'Responden SKM Tata Usaha';
     }
 
-    public function getQuery(): Builder
+    Protected function getQuery(): Builder
     {
-        return Responden::getQuery()
-            ->whereNotNull('j_layanantu');
+        return Responden::query()
+            ->whereNotNull('j_layanantu')
+            ->orderBy('nama', 'asc');
     }
 
     public function table(Table $table): Table

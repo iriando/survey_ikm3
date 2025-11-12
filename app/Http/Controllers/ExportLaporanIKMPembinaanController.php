@@ -87,8 +87,8 @@ class ExportLaporanIKMPembinaanController extends Controller
         $dataResponden[] = $avgRow;
 
         $skmRow = ['id_biodata' => 'Nilai SKM perparameter'];
-        $skmData = $this->getSkmPerParameter($kegiatanNama);
-        //$skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
+        // $skmData = $this->getSkmPerParameter($kegiatanNama);
+        $skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
         for ($i = 1; $i <= $maxUnsur; $i++) {
             $kd = 'P' . $i;
             $skmRow[$kd] = isset($skmData[$kd]) ? $skmData[$kd] : 0;
