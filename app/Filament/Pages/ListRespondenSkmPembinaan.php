@@ -9,7 +9,9 @@ use Filament\Tables\Table;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Columns\Column;
 use Illuminate\Support\Facades\Cache;
 
 class ListRespondenSkmPembinaan extends Page implements Tables\Contracts\HasTable
@@ -95,9 +97,29 @@ class ListRespondenSkmPembinaan extends Page implements Tables\Contracts\HasTabl
             ->actions([
                 Tables\Actions\DeleteAction::make('Hapus'),
             ])
+            ->headerActions([
+                ExportAction::make('export_all')
+                    ->label('Export Semua (Filtered)')
+                    ->exports([
+                        ExcelExport::make()
+                            ->withFilename(fn ($livewire, $livewireClass, $resource, $model, $recordIds, $query) => 'responden_' . now()->format('Ymd_His'))
+                            ->fromTable() // <-- ambil seluruh hasil query & filter aktif
+                            ->withColumns([
+                                Column::make('nama')->heading('Nama'),
+                                Column::make('nohp')->heading('No. HP'),
+                                Column::make('gender')->heading('Jenis Kelamin'),
+                                Column::make('pendidikan')->heading('Pendidikan'),
+                                Column::make('jabatan')->heading('Jabatan'),
+                                Column::make('instansi')->heading('Instansi'),
+                                Column::make('kegiatan')->heading('Kegiatan'),
+                                Column::make('jawabansurvey.skor')->heading('Skor'),
+                                Column::make('created_at')->heading('Tanggal Isi'),
+                            ]),
+                    ]),
+            ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-                ExportBulkAction::make(),
+                // ExportBulkAction::make(),
             ])
             ->paginationPageOptions([10, 20, 50]);
     }
