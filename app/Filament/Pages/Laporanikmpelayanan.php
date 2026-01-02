@@ -4,9 +4,9 @@ namespace App\Filament\Pages;
 
 use Filament\Tables;
 use Filament\Pages\Page;
-use App\Models\Responden;
+use App\Models\RespondenPelayanan;
 use Filament\Tables\Table;
-use App\Models\RespondenIkm;
+use App\Models\RespondenIkmPelayanan;
 use Filament\Actions\Action;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
@@ -51,7 +51,7 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
                     Select::make('jenisLayanan')
                         ->label('Jenis Layanan')
                         ->options(
-                            Responden::query()
+                            RespondenPelayanan::query()
                                 ->whereNotNull('j_layanan')
                                 ->distinct()
                                 ->pluck('j_layanan', 'j_layanan')
@@ -65,29 +65,60 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 
     public function getDataResponden()
     {
-        $pertanyaan = Pertanyaanikmpelayanan::all();
+        $pertanyaan = Pertanyaanikmpelayanan::with('unsur')->get();
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan')
-            ->selectRaw('
-                respondens.id AS responden_id,
-                respondens.nama AS nama_responden,
-                DATE(responden_ikms.updated_at) AS tanggal,
-                ' . collect($pertanyaan)->map(function ($p) {
-                    return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
-                })->implode(', ')
-            );
+        $selects = [
+            'respondenpelayanans.id AS responden_id',
+            'respondenpelayanans.nama AS nama_responden',
+            'DATE(responden_ikm_pelayanans.updated_at) AS tanggal',
+        ];
 
-        if ($this->jenisLayanan) {
-            $query->where('respondens.j_layanan', $this->jenisLayanan);
+        foreach ($pertanyaan as $p) {
+            $kd = $p->unsur->kd_unsur;
+            $selects[] = "MAX(CASE WHEN kd_unsurikmpelayanan = '{$kd}' THEN skor END) AS `{$kd}`";
         }
 
-        return $query
-            ->groupBy('respondens.id', 'respondens.nama', DB::raw('DATE(responden_ikms.updated_at)'))
+        return DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+            ->whereNotNull('respondenpelayanans.j_layanan')
+            ->when($this->jenisLayanan, fn($q) =>
+                $q->where('respondenpelayanans.j_layanan', $this->jenisLayanan)
+            )
+            ->selectRaw(implode(', ', $selects))
+            ->groupBy(
+                'respondenpelayanans.id',
+                'respondenpelayanans.nama',
+                DB::raw('DATE(responden_ikm_pelayanans.updated_at)')
+            )
             ->orderBy('tanggal')
             ->get();
     }
+
+    // public function getDataResponden()
+    // {
+    //     $pertanyaan = Pertanyaanikmpelayanan::all();
+
+    //     $query = DB::table('responden_ikm_pelayanans')
+    //         ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+    //         ->whereNotNull('respondenpelayanans.j_layanan')
+    //         ->selectRaw('
+    //             respondenpelayanans.id AS responden_id,
+    //             respondenpelayanans.nama AS nama_responden,
+    //             DATE(responden_ikm_pelayanans.updated_at) AS tanggal,
+    //             ' . collect($pertanyaan)->map(function ($p) {
+    //                 return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
+    //             })->implode(', ')
+    //         );
+
+    //     if ($this->jenisLayanan) {
+    //         $query->where('respondenpelayanans.j_layanan', $this->jenisLayanan);
+    //     }
+
+    //     return $query
+    //         ->groupBy('respondenpelayanans.id', 'respondenpelayanans.nama', DB::raw('DATE(responden_ikm_pelayanans.updated_at)'))
+    //         ->orderBy('tanggal')
+    //         ->get();
+    // }
 
     // public function getDataResponden()
     // {
@@ -120,7 +151,7 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 
     public function getGenderCount()
     {
-        $query = Responden::query()
+        $query = RespondenPelayanan::query()
             ->whereNotNull('j_layanan')
             ->whereHas('jawabansurvey');;
 
@@ -141,7 +172,7 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 
     public function getPendidikanCount()
     {
-        $query = Responden::query()
+        $query = RespondenPelayanan::query()
             ->whereNotNull('j_layanan')
             ->whereHas('jawabansurvey');
 
@@ -163,18 +194,18 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 
     public function getTotalPerParameter()
     {
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan');
+        $query = DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+            ->whereNotNull('respondenpelayanans.j_layanan');
 
         if ($this->tanggalMulai) {
-            $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '>=', $this->tanggalMulai);
         }
         if ($this->tanggalAkhir) {
-            $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '<=', $this->tanggalAkhir);
         }
         if ($this->jenisLayanan) {
-            $query->where('respondens.j_layanan', $this->jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $this->jenisLayanan);
         }
 
         return $query
@@ -185,18 +216,18 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
 
     public function getAveragePerParameter()
     {
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+        $query = DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
             ->whereNotNull('j_layanan');
 
         if ($this->tanggalMulai) {
-            $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '>=', $this->tanggalMulai);
         }
         if ($this->tanggalAkhir) {
-            $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '<=', $this->tanggalAkhir);
         }
         if ($this->jenisLayanan) {
-            $query->where('respondens.j_layanan', $this->jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $this->jenisLayanan);
         }
 
         return $query
@@ -210,18 +241,18 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         $totalParameter = Pertanyaanikmpelayanan::count();
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+        $query = DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
             ->whereNotNull('j_layanan');
 
         if ($this->tanggalMulai) {
-            $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '>=', $this->tanggalMulai);
         }
         if ($this->tanggalAkhir) {
-            $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '<=', $this->tanggalAkhir);
         }
         if ($this->jenisLayanan) {
-            $query->where('respondens.j_layanan', $this->jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $this->jenisLayanan);
         }
 
         return $query
@@ -242,22 +273,22 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
         $konversi = 100 / $totalNp;
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan');
+        $query = DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+            ->whereNotNull('respondenpelayanans.j_layanan');
 
         if ($this->tanggalMulai) {
-            $query->whereDate('responden_ikms.created_at', '>=', $this->tanggalMulai);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '>=', $this->tanggalMulai);
         }
         if ($this->tanggalAkhir) {
-            $query->whereDate('responden_ikms.created_at', '<=', $this->tanggalAkhir);
+            $query->whereDate('responden_ikm_pelayanans.created_at', '<=', $this->tanggalAkhir);
         }
         if ($this->jenisLayanan) {
-            $query->where('respondens.j_layanan', $this->jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $this->jenisLayanan);
         }
 
         $totalSkor = $query->sum('skor');
-        $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
+        $totalResponden = $query->distinct('responden_ikm_pelayanans.id_biodata')->count('responden_ikm_pelayanans.id_biodata');
 
         if ($totalResponden === 0) {
             return 0;
@@ -271,7 +302,7 @@ class Laporanikmpelayanan extends Page implements Tables\Contracts\HasTable
     {
         return $table
             ->query(function () {
-                $query = RespondenIkm::query()->with('responden');
+                $query = RespondenIkmPelayanan::query()->with('responden');
 
                 if ($this->tanggalMulai) {
                     $query->whereDate('updated_at', '>=', $this->tanggalMulai);

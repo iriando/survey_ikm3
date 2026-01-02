@@ -20,9 +20,9 @@ class ListRespondenSkmPembinaan extends Page implements Tables\Contracts\HasTabl
     use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
-    protected static ?string $navigationGroup = 'IKM Pembinaan';
-    protected static ?string $navigationLabel = 'Responden';
-    protected static ?string $slug = 'respondenskmpembinaan';
+    // protected static ?string $navigationGroup = 'IKM Pembinaan';
+    // protected static ?string $navigationLabel = 'Responden';
+    // protected static ?string $slug = 'respondenskmpembinaan';
     protected static string $view = 'filament.pages.list-responden-skm-pembinaan';
 
     public function getTitle(): string

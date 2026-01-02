@@ -6,10 +6,10 @@ use App\Models\Layanan;
 use App\Models\Instansi;
 use App\Models\Kegiatan;
 use App\Models\Layanantu;
-use App\Models\Responden;
+use App\Models\RespondenPelayanan;
 use App\Models\Narasumber;
 use App\Models\Pertanyaan;
-use App\Models\RespondenIkm;
+use App\Models\RespondenIkmPelayanan;
 use Illuminate\Http\Request;
 use App\Models\Pertanyaanikmtu;
 use App\Models\Pertanyaanikmpelayanan;
@@ -68,7 +68,7 @@ class RespondenController extends Controller
             'jabatan' => 'string|nullable',
         ]);
 
-        $responden = Responden::create($request->all());
+        $responden = RespondenPelayanan::create($request->all());
 
         return redirect()->route('skmpelayanan.skm', ['id' => $responden->id])->with('success', 'Data berhasil disimpan!');
     }
@@ -130,8 +130,8 @@ class RespondenController extends Controller
 
     public function skmpelayanan($id)
     {
-        $responden = Responden::findOrFail($id);
-        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+        $responden = RespondenPelayanan::findOrFail($id);
+        $sudahIsi = RespondenIkmPelayanan::where('id_biodata', $id)
             ->whereNotNull('kd_unsurikmpelayanan')
             ->exists();
         if ($sudahIsi) {
@@ -181,7 +181,7 @@ class RespondenController extends Controller
         $request->validate([
             'jawaban' => 'required|array',
         ]);
-        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+        $sudahIsi = RespondenIkmPelayanan::where('id_biodata', $id)
             ->whereNotNull('kd_unsurikmpelayanan')
             ->exists();
 
@@ -191,7 +191,7 @@ class RespondenController extends Controller
         }
         foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
             $pilihan = Pilihan_jawabanikmpelayanan::find($pilihan_id);
-            RespondenIkm::create([
+            RespondenIkmPelayanan::create([
                 'id_biodata' => $id,
                 'kd_unsurikmpelayanan' => $kd_unsur,
                 'skor' => $pilihan?->bobot ?? 0,
@@ -220,7 +220,7 @@ class RespondenController extends Controller
 
     public function kritiksaran($id)
     {
-        $responden = Responden::findOrFail($id);
+        $responden = RespondenPelayanan::findOrFail($id);
         return view('kritik-saran', compact('responden'));
     }
 
@@ -230,7 +230,7 @@ class RespondenController extends Controller
             'kritik_saran' => 'nullable|string|max:1000',
         ]);
 
-        $responden = Responden::findOrFail($id);
+        $responden = RespondenPelayanan::findOrFail($id);
         $responden->kritik_saran = $request->input('kritik_saran');
         $responden->save();
 

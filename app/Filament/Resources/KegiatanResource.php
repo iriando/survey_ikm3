@@ -34,6 +34,9 @@ class KegiatanResource extends Resource
                 Forms\Components\Textarea::make('n_kegiatan')
                     ->label('Input Nama kegiatan')
                     ->required(),
+                Forms\Components\Datepicker::make('tanggal_kegiatan')
+                    ->label('Input Tanggal kegiatan')
+                    ->required(),
                 Forms\Components\Repeater::make('narasumbers')
                 ->label('Daftar Narasumber')
                 ->relationship()

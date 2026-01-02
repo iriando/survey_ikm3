@@ -34,13 +34,13 @@ class IkmPerBulanChart extends ChartWidget
         ];
 
         for ($i = 1; $i <= 12; $i++) {
-            $query = DB::table('responden_ikms')
-                ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-                ->whereNotNull('respondens.j_layanan')
-                ->whereMonth('responden_ikms.created_at', $i);
+            $query = DB::table('responden_ikm_pelayanans')
+                ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+                ->whereNotNull('respondenpelayanans.j_layanan')
+                ->whereMonth('responden_ikm_pelayanans.created_at', $i);
 
             $totalSkor = $query->sum('skor');
-            $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
+            $totalResponden = $query->distinct('responden_ikm_pelayanans.id_biodata')->count('responden_ikm_pelayanans.id_biodata');
 
             $ikm = $totalResponden > 0
                 ? round(($totalSkor / $totalResponden) * $bobot * $konversi, 2)

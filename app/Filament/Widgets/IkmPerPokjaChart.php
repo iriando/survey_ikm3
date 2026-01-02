@@ -40,14 +40,14 @@ class IkmPerPokjaChart extends ChartWidget
                 ->where('pokja', $pokja)
                 ->pluck('j_layanan');
 
-            $query = DB::table('responden_ikms')
-                ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-                ->whereIn('respondens.j_layanan', $layanans)
-                ->whereYear('responden_ikms.created_at', $tahun);
+            $query = DB::table('responden_ikm_pelayanans')
+                ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+                ->whereIn('respondenpelayanans.j_layanan', $layanans)
+                ->whereYear('responden_ikm_pelayanans.created_at', $tahun);
 
             $totalSkor = $query->sum('skor');
-            $totalResponden = $query->distinct('responden_ikms.id_biodata')
-                ->count('responden_ikms.id_biodata');
+            $totalResponden = $query->distinct('responden_ikm_pelayanans.id_biodata')
+                ->count('responden_ikm_pelayanans.id_biodata');
 
             $ikm = $totalResponden > 0
                 ? round(($totalSkor / $totalResponden) * $bobot * $konversi, 2)

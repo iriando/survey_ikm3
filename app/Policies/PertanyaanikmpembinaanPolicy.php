@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Responden;
+use App\Models\Pertanyaanikmpembinaan;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RespondenPolicy
+class PertanyaanikmpembinaanPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class RespondenPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_responden');
+        return $user->can('view_any_pertanyaanikmpembinaan');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Responden $responden): bool
+    public function view(User $user, Pertanyaanikmpembinaan $pertanyaanikmpembinaan): bool
     {
-        return $user->can('view_responden');
+        return $user->can('view_pertanyaanikmpembinaan');
     }
 
     /**
@@ -31,23 +31,23 @@ class RespondenPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_responden');
+        return $user->can('create_pertanyaanikmpembinaan');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Responden $responden): bool
+    public function update(User $user, Pertanyaanikmpembinaan $pertanyaanikmpembinaan): bool
     {
-        return $user->can('update_responden');
+        return $user->can('update_pertanyaanikmpembinaan');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Responden $responden): bool
+    public function delete(User $user, Pertanyaanikmpembinaan $pertanyaanikmpembinaan): bool
     {
-        return $user->can('delete_responden');
+        return $user->can('delete_pertanyaanikmpembinaan');
     }
 
     /**
@@ -55,15 +55,15 @@ class RespondenPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_responden');
+        return $user->can('delete_any_pertanyaanikmpembinaan');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Responden $responden): bool
+    public function forceDelete(User $user, Pertanyaanikmpembinaan $pertanyaanikmpembinaan): bool
     {
-        return $user->can('force_delete_responden');
+        return $user->can('force_delete_pertanyaanikmpembinaan');
     }
 
     /**
@@ -71,15 +71,15 @@ class RespondenPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_responden');
+        return $user->can('force_delete_any_pertanyaanikmpembinaan');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Responden $responden): bool
+    public function restore(User $user, Pertanyaanikmpembinaan $pertanyaanikmpembinaan): bool
     {
-        return $user->can('restore_responden');
+        return $user->can('restore_pertanyaanikmpembinaan');
     }
 
     /**
@@ -87,15 +87,15 @@ class RespondenPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_responden');
+        return $user->can('restore_any_pertanyaanikmpembinaan');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Responden $responden): bool
+    public function replicate(User $user, Pertanyaanikmpembinaan $pertanyaanikmpembinaan): bool
     {
-        return $user->can('replicate_responden');
+        return $user->can('replicate_pertanyaanikmpembinaan');
     }
 
     /**
@@ -103,6 +103,6 @@ class RespondenPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_responden');
+        return $user->can('reorder_pertanyaanikmpembinaan');
     }
 }

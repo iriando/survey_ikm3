@@ -34,10 +34,10 @@ class UnsurIKMPelayananSeeder extends Seeder
 
             // Buat pilihan jawaban untuk pertanyaan ini
             $pilihans = [
-                ['teks_pilihan' => 'Tidak Baik', 'np' => 1, 'mutu' => 'D'],
-                ['teks_pilihan' => 'Kurang Baik', 'np' => 2, 'mutu' => 'C'],
-                ['teks_pilihan' => 'Baik', 'np' => 3, 'mutu' => 'B'],
-                ['teks_pilihan' => 'Sangat Baik', 'np' => 4, 'mutu' => 'A'],
+                ['teks_pilihan' => 'Tidak Baik', 'np' => 1, 'bobot' => 2.6, 'mutu' => 'D'],
+                ['teks_pilihan' => 'Kurang Baik', 'np' => 2, 'bobot' => 3.06, 'mutu' => 'C'],
+                ['teks_pilihan' => 'Baik', 'np' => 3, 'bobot' => 3.53, 'mutu' => 'B'],
+                ['teks_pilihan' => 'Sangat Baik', 'np' => 4, 'bobot' => 4, 'mutu' => 'A'],
             ];
 
             foreach ($pilihans as $pilihan) {

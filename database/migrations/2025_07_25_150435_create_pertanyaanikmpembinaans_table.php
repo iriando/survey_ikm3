@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pertanyaanikmpembinaans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('unsur_id')->references('id')->on('unsurs')->onDelete('cascade');
+            $table->foreignId('unsur_id')->references('id')->on('unsurikmpembinaans')->onDelete('cascade');
             $table->text('teks_pertanyaan');
             $table->timestamps();
         });

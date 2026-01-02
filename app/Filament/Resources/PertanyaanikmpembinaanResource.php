@@ -2,22 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PertanyaanikmpembinaanResource\Pages;
+use App\Filament\Resources\PertanyaanikmpembinaanResource\RelationManagers;
+use App\Models\Pertanyaanikmpembinaan;
 use Filament\Forms;
-use Filament\Tables;
-use App\Models\Unsur;
-use Filament\Forms\Set;
 use Filament\Forms\Form;
-use App\Models\Pertanyaan;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PertanyaanResource\Pages;
-use App\Filament\Resources\PertanyaanResource\RelationManagers;
 
-class PertanyaanResource extends Resource
+class PertanyaanikmpembinaanResource extends Resource
 {
-    protected static ?string $model = Pertanyaan::class;
+    protected static ?string $model = Pertanyaanikmpembinaan::class;
 
     protected static ?string $navigationGroup = 'IKM Pembinaan';
 
@@ -81,9 +79,6 @@ class PertanyaanResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->emptyStateActions([
-                // Tables\Actions\CreateAction::make(),
             ]);
     }
 
@@ -97,9 +92,9 @@ class PertanyaanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPertanyaans::route('/'),
-            'create' => Pages\CreatePertanyaan::route('/create'),
-            'edit' => Pages\EditPertanyaan::route('/{record}/edit'),
+            'index' => Pages\ListPertanyaanikmpembinaans::route('/'),
+            'create' => Pages\CreatePertanyaanikmpembinaan::route('/create'),
+            'edit' => Pages\EditPertanyaanikmpembinaan::route('/{record}/edit'),
         ];
     }
 }

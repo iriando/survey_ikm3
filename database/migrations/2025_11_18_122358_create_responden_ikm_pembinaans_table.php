@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->foreign('id_biodata')->references('id')->on('respondenpembinaans')->onDelete('cascade');
 
-            $table->foreign('kd_unsurikmpembinaan')->references('kd_unsur')->on('unsurs')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('kd_unsurikmpembinaan')->references('kd_unsur')->on('unsurikmpembinaans')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

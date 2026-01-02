@@ -33,13 +33,13 @@ class IkmPerLayananChart extends ChartWidget
         $ikmPerLayanan = [];
 
         foreach ($layanans as $id => $namaLayanan) {
-            $query = DB::table('responden_ikms')
-                ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-                ->where('respondens.j_layanan', $namaLayanan)
-                ->whereYear('responden_ikms.created_at', $tahun);
+            $query = DB::table('responden_ikm_pelayanans')
+                ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+                ->where('respondenpelayanans.j_layanan', $namaLayanan)
+                ->whereYear('responden_ikm_pelayanans.created_at', $tahun);
 
             $totalSkor = $query->sum('skor');
-            $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
+            $totalResponden = $query->distinct('responden_ikm_pelayanans.id_biodata')->count('responden_ikm_pelayanans.id_biodata');
 
             $ikm = $totalResponden > 0
                 ? round(($totalSkor / $totalResponden) * $bobot * $konversi, 2)

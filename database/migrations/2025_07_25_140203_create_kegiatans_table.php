@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('kd_kegiatan');
             $table->string('n_kegiatan');
+            $table->date('tanggal_kegiatan');
             $table->timestamps();
         });
     }

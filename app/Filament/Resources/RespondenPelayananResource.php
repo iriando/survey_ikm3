@@ -1,38 +1,38 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources;
 
+use App\Filament\Resources\RespondenPelayananResource\Pages;
+use App\Filament\Resources\RespondenPelayananResource\RelationManagers;
+use App\Models\RespondenPelayanan;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Pages\Page;
-use App\Models\Responden;
 use Filament\Tables\Table;
-use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ListRespondenSkmPelayanan extends Page implements Tables\Contracts\HasTable
+class RespondenPelayananResource extends Resource
 {
-    use Tables\Concerns\InteractsWithTable;
-    use HasPageShield;
+    protected static ?string $model = RespondenPelayanan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationGroup = 'IKM Pelayanan';
     protected static ?string $navigationLabel = 'Responden';
-    protected static ?string $slug = 'respondenskmpelayanan';
 
-    // ini wajib — tanpa ini, Filament tidak tahu tampilan yang digunakan
-    protected static string $view = 'filament.pages.list-responden-skm-pelayanan';
-
-    public function getTitle(): string
+    public static function form(Form $form): Form
     {
-        return 'Responden SKM Pelayanan';
+        return $form
+            ->schema([
+                //
+            ]);
     }
 
-    public function table(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
-            ->query($this->getQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('nama')->label('Nama')->searchable(),
                 Tables\Columns\TextColumn::make('usia')->label('Usia'),
@@ -68,7 +68,7 @@ class ListRespondenSkmPelayanan extends Page implements Tables\Contracts\HasTabl
                     ]),
                 Tables\Filters\SelectFilter::make('usia')
                     ->options(
-                        Responden::query()
+                        RespondenPelayanan::query()
                         ->select('usia')
                         ->distinct()
                         ->pluck('usia', 'usia')
@@ -76,7 +76,7 @@ class ListRespondenSkmPelayanan extends Page implements Tables\Contracts\HasTabl
                     ),
                 Tables\Filters\SelectFilter::make('pendidikan')
                     ->options(
-                        Responden::query()
+                        RespondenPelayanan::query()
                         ->select('pendidikan')
                         ->distinct()
                         ->pluck('pendidikan', 'pendidikan')
@@ -85,7 +85,7 @@ class ListRespondenSkmPelayanan extends Page implements Tables\Contracts\HasTabl
                 Tables\Filters\SelectFilter::make('j_layanan')
                     ->label('Jenis Pelayanan')
                     ->options(
-                        Responden::query()
+                        RespondenPelayanan::query()
                         ->whereNotNull('j_layanan')
                         ->select('j_layanan')
                         ->distinct()
@@ -94,18 +94,28 @@ class ListRespondenSkmPelayanan extends Page implements Tables\Contracts\HasTabl
                     ),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-                ExportBulkAction::make(),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
-    protected function getQuery(): Builder
+    public static function getRelations(): array
     {
-        return Responden::query()
-            ->whereNotNull('j_layanan')
-            ->orderBy('nama', 'asc');
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListRespondenPelayanans::route('/'),
+            'create' => Pages\CreateRespondenPelayanan::route('/create'),
+            'edit' => Pages\EditRespondenPelayanan::route('/{record}/edit'),
+        ];
     }
 }

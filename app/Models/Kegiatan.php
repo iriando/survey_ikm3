@@ -12,6 +12,7 @@ class Kegiatan extends Model
         'kd_kegiatan',
         'n_kegiatan',
         'status',
+        'tanggal_kegiatan'
     ];
 
     public function narasumbers()

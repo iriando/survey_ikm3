@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('skor');
             $table->timestamps();
 
-            $table->foreign('id_biodata')->references('id')->on('respondens')->onDelete('cascade');
+            $table->foreign('id_biodata')->references('id')->on('respondenpelayanans')->onDelete('cascade');
 
             // $table->foreign('kd_unsurikmpembinaan')->references('kd_unsur')->on('unsurs')->onDelete('cascade')->onUpdate('cascade');
 

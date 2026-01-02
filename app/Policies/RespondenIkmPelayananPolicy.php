@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Pertanyaan;
+use App\Models\RespondenIkmPelayanan;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PertanyaanPolicy
+class RespondenIkmPelayananPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class PertanyaanPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_pertanyaan');
+        return $user->can('view_any_responden::ikm::pelayanan');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Pertanyaan $pertanyaan): bool
+    public function view(User $user, RespondenIkmPelayanan $respondenIkmPelayanan): bool
     {
-        return $user->can('view_pertanyaan');
+        return $user->can('view_responden::ikm::pelayanan');
     }
 
     /**
@@ -31,23 +31,23 @@ class PertanyaanPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_pertanyaan');
+        return $user->can('create_responden::ikm::pelayanan');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Pertanyaan $pertanyaan): bool
+    public function update(User $user, RespondenIkmPelayanan $respondenIkmPelayanan): bool
     {
-        return $user->can('update_pertanyaan');
+        return $user->can('update_responden::ikm::pelayanan');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Pertanyaan $pertanyaan): bool
+    public function delete(User $user, RespondenIkmPelayanan $respondenIkmPelayanan): bool
     {
-        return $user->can('delete_pertanyaan');
+        return $user->can('delete_responden::ikm::pelayanan');
     }
 
     /**
@@ -55,15 +55,15 @@ class PertanyaanPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_pertanyaan');
+        return $user->can('delete_any_responden::ikm::pelayanan');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Pertanyaan $pertanyaan): bool
+    public function forceDelete(User $user, RespondenIkmPelayanan $respondenIkmPelayanan): bool
     {
-        return $user->can('force_delete_pertanyaan');
+        return $user->can('force_delete_responden::ikm::pelayanan');
     }
 
     /**
@@ -71,15 +71,15 @@ class PertanyaanPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_pertanyaan');
+        return $user->can('force_delete_any_responden::ikm::pelayanan');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Pertanyaan $pertanyaan): bool
+    public function restore(User $user, RespondenIkmPelayanan $respondenIkmPelayanan): bool
     {
-        return $user->can('restore_pertanyaan');
+        return $user->can('restore_responden::ikm::pelayanan');
     }
 
     /**
@@ -87,15 +87,15 @@ class PertanyaanPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_pertanyaan');
+        return $user->can('restore_any_responden::ikm::pelayanan');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Pertanyaan $pertanyaan): bool
+    public function replicate(User $user, RespondenIkmPelayanan $respondenIkmPelayanan): bool
     {
-        return $user->can('replicate_pertanyaan');
+        return $user->can('replicate_responden::ikm::pelayanan');
     }
 
     /**
@@ -103,6 +103,6 @@ class PertanyaanPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_pertanyaan');
+        return $user->can('reorder_responden::ikm::pelayanan');
     }
 }

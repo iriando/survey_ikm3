@@ -5,8 +5,8 @@ namespace App\Filament\Pages;
 use Filament\Tables;
 use App\Models\Kegiatan;
 use Filament\Pages\Page;
-use App\Models\Responden;
-use App\Models\Pertanyaan;
+use App\Models\RespondenPembinaan;
+use App\Models\Pertanyaanikmpembinaan;
 use Filament\Tables\Table;
 use App\Models\RespondenIkm;
 use Filament\Actions\Action;
@@ -35,7 +35,7 @@ class Laporanikmpembinaan extends Page
             Select::make('kegiatan')
                 ->label('Kegiatan')
                 ->options(
-                    Responden::whereNotNull('kegiatan')
+                    RespondenPembinaan::whereNotNull('kegiatan')
                         ->distinct()
                         ->pluck('kegiatan', 'kegiatan')
                         ->toArray()
@@ -47,33 +47,33 @@ class Laporanikmpembinaan extends Page
 
     public function getDataResponden()
     {
-        $pertanyaan = Pertanyaan::all();
+        $pertanyaan = Pertanyaanikmpembinaan::all();
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.kegiatan')
+        $query = DB::table('responden_ikm_pembinaans')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
+            ->whereNotNull('respondenpembinaans.kegiatan')
             ->selectRaw('
-                respondens.id AS responden_id,
-                respondens.nama AS nama_responden,
-                DATE(responden_ikms.updated_at) AS tanggal,
+                respondenpembinaans.id AS responden_id,
+                respondenpembinaans.nama AS nama_responden,
+                DATE(responden_ikm_pembinaans.updated_at) AS tanggal,
                 ' . collect($pertanyaan)->map(function ($p) {
                     return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
                 })->implode(', ')
             );
 
         if ($this->kegiatan) {
-            $query->where('respondens.kegiatan', $this->kegiatan);
+            $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
         }
 
         return $query
-            ->groupBy('respondens.id', 'respondens.nama', DB::raw('DATE(responden_ikms.updated_at)'))
+            ->groupBy('respondenpembinaans.id', 'respondenpembinaans.nama', DB::raw('DATE(responden_ikm_pembinaans.updated_at)'))
             ->orderBy('tanggal')
             ->get();
     }
 
     public function getPertanyaan()
     {
-        return Pertanyaan::all();
+        return Pertanyaanikmpembinaan::all();
     }
 
     public function getGenderCount()
