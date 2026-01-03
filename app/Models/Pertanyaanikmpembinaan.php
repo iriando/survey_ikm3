@@ -16,12 +16,12 @@ class Pertanyaanikmpembinaan extends Model
 
     public function unsur()
     {
-        return $this->belongsTo(Unsur::class);
+        return $this->belongsTo(Unsurikmpembinaan::class, 'unsur_id');
     }
 
     public function pilihanJawabans()
     {
-        return $this->hasMany(Pilihan_jawabanikmpembinaan::class);
+        return $this->hasMany(Pilihan_jawabanikmpembinaan::class, 'pertanyaan_id');
     }
 
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Unsur extends Model
+class Unsurikmpembinaan extends Model
 {
     use HasFactory;
     protected $fillable = [
@@ -17,6 +17,6 @@ class Unsur extends Model
 
     public function pertanyaan()
     {
-        return $this->hasOne(Pertanyaan::class);
+        return $this->hasOne(Pertanyaanikmpembinaan::class, 'unsur_id');
     }
 }

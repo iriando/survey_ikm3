@@ -10,7 +10,7 @@
             <h2>Kritik & Saran</h2>
             <p>Silakan berikan masukan Anda setelah mengisi survei.</p>
 
-            <form method="POST" action="{{ route('kritik-saran.submit', $responden->id) }}">
+            <form method="POST" action="{{ route('kritik-saranpembinaan.submit', $responden->id) }}">
                 @csrf
                 <div class="mb-3">
                     <label for="kritik_saran" class="form-label">Kritik & Saran</label>

@@ -8,7 +8,7 @@ use Filament\Pages\Page;
 use App\Models\RespondenPembinaan;
 use App\Models\Pertanyaanikmpembinaan;
 use Filament\Tables\Table;
-use App\Models\RespondenIkm;
+use App\Models\RespondenIkmPembinaan;
 use Filament\Actions\Action;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
@@ -47,29 +47,56 @@ class Laporanikmpembinaan extends Page
 
     public function getDataResponden()
     {
-        $pertanyaan = Pertanyaanikmpembinaan::all();
+        $pertanyaan = Pertanyaanikmpembinaan::with('unsur')->get();
 
-        $query = DB::table('responden_ikm_pembinaans')
-            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
-            ->whereNotNull('respondenpembinaans.kegiatan')
-            ->selectRaw('
-                respondenpembinaans.id AS responden_id,
-                respondenpembinaans.nama AS nama_responden,
-                DATE(responden_ikm_pembinaans.updated_at) AS tanggal,
-                ' . collect($pertanyaan)->map(function ($p) {
-                    return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
-                })->implode(', ')
-            );
+        $selects = [
+            'respondenpembinaans.id AS responden_id',
+            'respondenpembinaans.nama AS nama_responden',
+            'DATE(responden_ikm_pembinaans.updated_at) AS tanggal',
+        ];
 
-        if ($this->kegiatan) {
-            $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
+        foreach ($pertanyaan as $p) {
+            $kd = $p->unsur->kd_unsur;
+            $selects[] = "MAX(CASE WHEN kd_unsurikmpembinaan = '{$kd}' THEN skor END) AS `{$kd}`";
         }
 
-        return $query
-            ->groupBy('respondenpembinaans.id', 'respondenpembinaans.nama', DB::raw('DATE(responden_ikm_pembinaans.updated_at)'))
+        return DB::table('responden_ikm_pembinaans')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
+            ->whereNotNull('respondenpembinaans.kegiatan')
+            ->selectRaw(implode(', ', $selects))
+            ->groupBy(
+                'respondenpembinaans.id',
+                'respondenpembinaans.nama',
+                DB::raw('DATE(responden_ikm_pembinaans.updated_at)')
+            )
             ->orderBy('tanggal')
             ->get();
     }
+    // public function getDataResponden()
+    // {
+    //     $pertanyaan = Pertanyaanikmpembinaan::all();
+
+    //     $query = DB::table('responden_ikm_pembinaans')
+    //         ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
+    //         ->whereNotNull('respondenpembinaans.kegiatan')
+    //         ->selectRaw('
+    //             respondenpembinaans.id AS responden_id,
+    //             respondenpembinaans.nama AS nama_responden,
+    //             DATE(responden_ikm_pembinaans.updated_at) AS tanggal,
+    //             ' . collect($pertanyaan)->map(function ($p) {
+    //                 return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$p->unsur->kd_unsur}' THEN skor END) AS `{$p->unsur->kd_unsur}`";
+    //             })->implode(', ')
+    //         );
+
+    //     if ($this->kegiatan) {
+    //         $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
+    //     }
+
+    //     return $query
+    //         ->groupBy('respondenpembinaans.id', 'respondenpembinaans.nama', DB::raw('DATE(responden_ikm_pembinaans.updated_at)'))
+    //         ->orderBy('tanggal')
+    //         ->get();
+    // }
 
     public function getPertanyaan()
     {
@@ -78,7 +105,7 @@ class Laporanikmpembinaan extends Page
 
     public function getGenderCount()
     {
-        $query = Responden::query()
+        $query = RespondenPembinaan::query()
             ->whereNotNull('kegiatan')
             ->whereHas('jawabansurvey');
 
@@ -93,7 +120,7 @@ class Laporanikmpembinaan extends Page
 
     public function getPendidikanCount()
     {
-        $query = Responden::query()
+        $query = RespondenPembinaan::query()
             ->whereNotNull('kegiatan')
             ->whereHas('jawabansurvey');
 
@@ -109,13 +136,13 @@ class Laporanikmpembinaan extends Page
 
     public function getTotalPerParameter()
     {
-        $query = DB::table('responden_ikms')
+        $query = DB::table('responden_ikm_pembinaans')
             ->whereNotNull('kegiatan')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
             ->select('kd_unsurikmpembinaan', DB::raw('SUM(skor) as total_skor'));
 
         if ($this->kegiatan) {
-            $query->where('respondens.kegiatan', $this->kegiatan);
+            $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
         }
 
         return $query->groupBy('kd_unsurikmpembinaan')->get();
@@ -123,13 +150,13 @@ class Laporanikmpembinaan extends Page
 
     public function getAveragePerParameter()
     {
-        $query = DB::table('responden_ikms')
+        $query = DB::table('responden_ikm_pembinaans')
             ->whereNotNull('kegiatan')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
             ->select('kd_unsurikmpembinaan', DB::raw('FORMAT(AVG(skor), 2) as avg_skor'));
 
         if ($this->kegiatan) {
-            $query->where('respondens.kegiatan', $this->kegiatan);
+            $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
         }
         // dd($query->toSql(), $query->getBindings());
         return $query->groupBy('kd_unsurikmpembinaan')->get();
@@ -137,22 +164,22 @@ class Laporanikmpembinaan extends Page
 
     public function getSkmPerParameter()
     {
-        $totalParameter = Pertanyaan::count();
+        $totalParameter = Pertanyaanikmpembinaan::count();
         $bobot = 1 / $totalParameter;
-        $query = DB::table('responden_ikms')
+        $query = DB::table('responden_ikm_pembinaans')
             ->whereNotNull('kegiatan')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
             ->select('kd_unsurikmpembinaan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"));
 
         if ($this->kegiatan) {
-            $query->where('respondens.kegiatan', $this->kegiatan);
+            $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
         }
         return $query->groupBy('kd_unsurikmpembinaan')->get();
     }
 
     public function getIkm()
     {
-        $totalParameter = Pertanyaan::count();
+        $totalParameter = Pertanyaanikmpembinaan::count();
         $totalNp = NilaiPersepsiIkm::count();
 
         if ($totalParameter === 0 || $totalNp === 0) {
@@ -161,16 +188,16 @@ class Laporanikmpembinaan extends Page
 
         $konversi = 100 / $totalNp;
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.kegiatan');
+        $query = DB::table('responden_ikm_pembinaans')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
+            ->whereNotNull('respondenpembinaans.kegiatan');
 
         if ($this->kegiatan) {
-            $query->where('respondens.kegiatan', $this->kegiatan);
+            $query->where('respondenpembinaans.kegiatan', $this->kegiatan);
         }
 
         $totalSkor = $query->sum('skor');
-        $totalResponden = $query->distinct('responden_ikms.id_biodata')->count('responden_ikms.id_biodata');
+        $totalResponden = $query->distinct('responden_ikm_pembinaans.id_biodata')->count('responden_ikm_pembinaans.id_biodata');
 
         if ($totalResponden === 0) {
             return 0;

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('jabatan', 255);
             $table->string('instansi', 255);
             $table->string('kegiatan', 255);
-            $table->string('kritik_saran', 255);
+            $table->text('kritik_saran', 255)->nullable();
             $table->timestamps();
         });
     }

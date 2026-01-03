@@ -2,23 +2,26 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\UnsurikmpembinaanResource\Pages;
+use App\Filament\Resources\UnsurikmpembinaanResource\RelationManagers;
+use App\Models\Unsurikmpembinaan;
 use Filament\Forms;
-use Filament\Tables;
-use App\Models\Unsur;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use App\Filament\Resources\UnsurResource\Pages;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UnsurResource extends Resource
+class UnsurikmpembinaanResource extends Resource
 {
-    protected static ?string $model = Unsur::class;
+    protected static ?string $model = Unsurikmpembinaan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
 
     protected static ?string $navigationGroup = 'IKM Pembinaan';
 
-    protected static ?string $navigationLabel = 'Unsur';
+    protected static ?string $navigationLabel = 'Unsur IKM Pembinaan';
 
     public static function form(Form $form): Form
     {
@@ -114,9 +117,8 @@ class UnsurResource extends Resource
                             ->grid(2)
                             ->reorderable(false),
                     ])
-                    ->columns(1)
-                    ->columnSpanFull(),
-
+                ->columns(1)
+                ->columnSpanFull(),
             ]);
     }
 
@@ -143,25 +145,22 @@ class UnsurResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            // RelationManagers\PertanyaanRelationManager::class,
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUnsurs::route('/'),
-            'create' => Pages\CreateUnsur::route('/create'),
-            'edit' => Pages\EditUnsur::route('/{record}/edit'),
+            'index' => Pages\ListUnsurikmpembinaans::route('/'),
+            'create' => Pages\CreateUnsurikmpembinaan::route('/create'),
+            'edit' => Pages\EditUnsurikmpembinaan::route('/{record}/edit'),
         ];
     }
 }

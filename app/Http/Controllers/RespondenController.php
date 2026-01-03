@@ -6,14 +6,17 @@ use App\Models\Layanan;
 use App\Models\Instansi;
 use App\Models\Kegiatan;
 use App\Models\Layanantu;
+use App\Models\RespondenPembinaan;
 use App\Models\RespondenPelayanan;
 use App\Models\Narasumber;
 use App\Models\Pertanyaan;
 use App\Models\RespondenIkmPelayanan;
+use App\Models\RespondenIkmPembinaan;
 use Illuminate\Http\Request;
 use App\Models\Pertanyaanikmtu;
 use App\Models\Pertanyaanikmpelayanan;
-use App\Models\Pilihan_jawaban;
+use App\Models\Pertanyaanikmpembinaan;
+use App\Models\Pilihan_jawabanikmpembinaan;
 use App\Models\Pilihan_jawabanikmpelayanan;
 
 class RespondenController extends Controller
@@ -87,7 +90,7 @@ class RespondenController extends Controller
             'jabatan' => 'string|nullable',
         ]);
 
-        $responden = Responden::create($request->all());
+        $responden = RespondenPembinaan::create($request->all());
 
         return redirect()
                 ->route('skmpembinaan.skm', ['id' => $responden->id, 'narasumber_id' => $request->narasumber_id,])
@@ -116,15 +119,15 @@ class RespondenController extends Controller
 
     public function skmpembinaan($id)
     {
-        $responden = Responden::findOrFail($id);
-        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+        $responden = RespondenPembinaan::findOrFail($id);
+        $sudahIsi = RespondenIkmPembinaan::where('id_biodata', $id)
             ->whereNotNull('kd_unsurikmpembinaan')
             ->exists();
         if ($sudahIsi) {
-            return redirect()->route('kritik-saran.form', $id)
+            return redirect()->route('kritik-saranpembinaan.form', $id)
                 ->with('warning', 'Anda sudah pernah mengisi survei pembinaan ini.');
         }
-        $pertanyaans = Pertanyaan::with('pilihanJawabans', 'unsur')->get();
+        $pertanyaans = Pertanyaanikmpembinaan::with('pilihanJawabans', 'unsur')->get();
         return view('skmpembinaan.skm', compact('responden', 'pertanyaans'));
     }
 
@@ -135,7 +138,7 @@ class RespondenController extends Controller
             ->whereNotNull('kd_unsurikmpelayanan')
             ->exists();
         if ($sudahIsi) {
-            return redirect()->route('kritik-saran.form', $id)
+            return redirect()->route('kritik-saranpelayanan.form', $id)
                 ->with('warning', 'Anda sudah pernah mengisi survei pelayanan ini.');
         }
         $pertanyaans = Pertanyaanikmpelayanan::with('pilihanJawabans', 'unsur')->get();
@@ -156,23 +159,23 @@ class RespondenController extends Controller
             'jawaban' => 'required|array',
             'narasumber_id' => 'required|exists:narasumbers,id',
         ]);
-        $sudahIsi = RespondenIkm::where('id_biodata', $id)
+        $sudahIsi = RespondenIkmPembinaan::where('id_biodata', $id)
             ->whereNotNull('kd_unsurikmpembinaan')
             ->exists();
         if ($sudahIsi) {
-            return redirect()->route('kritik-saran.form', $id)
+            return redirect()->route('kritik-saranpembinaan.form', $id)
                 ->with('warning', 'Data survei Anda sudah tersimpan sebelumnya.');
         }
         foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
-            $pilihan = Pilihan_jawaban::find($pilihan_id);
-            RespondenIkm::create([
+            $pilihan = Pilihan_jawabanikmpembinaan::find($pilihan_id);
+            RespondenIkmPembinaan::create([
                 'id_biodata' => $id,
                 'kd_unsurikmpembinaan' => $kd_unsur,
                 'narasumber_id' => $request->narasumber_id,
                 'skor' => $pilihan?->bobot ?? 0,
             ]);
         }
-        return redirect()->route('kritik-saran.form', $id);
+        return redirect()->route('kritik-saranpembinaan.form', $id);
     }
 
     // Menyimpan Jawaban Survei
@@ -186,7 +189,7 @@ class RespondenController extends Controller
             ->exists();
 
         if ($sudahIsi) {
-            return redirect()->route('kritik-saran.form', $id)
+            return redirect()->route('kritik-saranpelayanan.form', $id)
                 ->with('warning', 'Data survei Anda sudah tersimpan sebelumnya.');
         }
         foreach ($request->jawaban as $kd_unsur => $pilihan_id) {
@@ -197,7 +200,7 @@ class RespondenController extends Controller
                 'skor' => $pilihan?->bobot ?? 0,
             ]);
         }
-        return redirect()->route('kritik-saran.form', $id);
+        return redirect()->route('kritik-saranpelayanan.form', $id);
     }
 
 
@@ -218,19 +221,38 @@ class RespondenController extends Controller
         return redirect()->route('kritik-saran.form', $id);
     }
 
-    public function kritiksaran($id)
+    public function kritiksaranrespelayanan($id)
     {
         $responden = RespondenPelayanan::findOrFail($id);
-        return view('kritik-saran', compact('responden'));
+        return view('skmpelayanan.kritik-saran', compact('responden'));
     }
 
-    public function submitkritiksaran(Request $request, $id)
+    public function submitkritiksaranrespelayanan(Request $request, $id)
     {
         $request->validate([
             'kritik_saran' => 'nullable|string|max:1000',
         ]);
 
         $responden = RespondenPelayanan::findOrFail($id);
+        $responden->kritik_saran = $request->input('kritik_saran');
+        $responden->save();
+
+        return redirect()->route('terima-kasih');
+    }
+
+    public function kritiksaranrespembinaan($id)
+    {
+        $responden = RespondenPembinaan::findOrFail($id);
+        return view('skmpembinaan.kritik-saran', compact('responden'));
+    }
+
+    public function submitkritiksaranrespembinaan(Request $request, $id)
+    {
+        $request->validate([
+            'kritik_saran' => 'nullable|string|max:1000',
+        ]);
+
+        $responden = RespondenPembinaan::findOrFail($id);
         $responden->kritik_saran = $request->input('kritik_saran');
         $responden->save();
 

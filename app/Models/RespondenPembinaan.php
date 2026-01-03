@@ -24,6 +24,6 @@ class RespondenPembinaan extends Model
 
     public function jawabansurvey()
     {
-        return $this->hasMany(RespondenIkmPeembinaan::class, 'id_biodata', 'id');
+        return $this->hasMany(RespondenIkmPembinaan::class, 'id_biodata', 'id');
     }
 }
