@@ -13,6 +13,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use pxlrbt\FilamentExcel\Columns\Column;
 
 class RespondenPelayananResource extends Resource
 {
@@ -93,12 +97,33 @@ class RespondenPelayananResource extends Resource
                         ->toArray()
                     ),
             ])
+            ->headerActions([
+                ExportAction::make('export_all')
+                    ->label('Export Semua (Filtered)')
+                    ->exports([
+                        ExcelExport::make()
+                            ->withFilename(fn ($livewire, $livewireClass, $resource, $model, $recordIds, $query) => 'responden_' . now()->format('Ymd_His'))
+                            ->fromTable() // <-- ambil seluruh hasil query & filter aktif
+                            ->withColumns([
+                                Column::make('nama')->heading('Nama'),
+                                Column::make('nohp')->heading('No. HP'),
+                                Column::make('gender')->heading('Jenis Kelamin'),
+                                Column::make('pendidikan')->heading('Pendidikan'),
+                                Column::make('jabatan')->heading('Jabatan'),
+                                Column::make('instansi')->heading('Instansi'),
+                                Column::make('kegiatan')->heading('Kegiatan'),
+                                Column::make('jawabansurvey.skor')->heading('Skor'),
+                                Column::make('created_at')->heading('Tanggal Isi'),
+                            ]),
+                    ]),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
