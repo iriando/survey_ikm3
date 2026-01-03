@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Unsur;
-use App\Models\Pilihan_jawaban;
+use App\Models\Unsurikmpembinaan;
+use App\Models\Pilihan_jawabanikmpembinaan;
 use App\Models\Kegiatan;
-use App\Models\Responden;
-use App\Models\Pertanyaan;
+use App\Models\RespondenPembinaan;
+use App\Models\Pertanyaanikmpembinaan;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpWord\TemplateProcessor;
 
@@ -16,16 +16,13 @@ class ExportLaporanIKMPembinaanController extends Controller
     {
         $kegiatan = Kegiatan::findOrFail($id);
         $kegiatanNama = $kegiatan->n_kegiatan;
-        $respondens = Responden::where('kegiatan', $kegiatanNama)
+        $respondens = RespondenPembinaan::where('kegiatan', $kegiatanNama)
             ->whereHas('jawabansurvey')
             ->get();
-        //$kegiatan = Kegiatan::where('n_kegiatan', $kegiatanNama)->firstOrFail();
-        //$respondens = Responden::where('kegiatan', $kegiatanNama)->whereHas('jawabansurvey')->get();
         $jumlah_responden = $respondens->count();
         $tanggal_kegiatan = \Carbon\Carbon::parse($kegiatan->created_at)->translatedFormat('d F Y');
         $ikm = $this->getIkm($kegiatanNama);
-        //$ikm = $this->getIkm($kegiatanNama);
-
+        
         $templatePath = storage_path('app/templates/laporan_ikm_pembinaan_kegiatan.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
         $templateProcessor->setValue('nama_kegiatan', $kegiatan->n_kegiatan);
@@ -33,7 +30,7 @@ class ExportLaporanIKMPembinaanController extends Controller
         $templateProcessor->setValue('jumlah_responden', $jumlah_responden);
         $templateProcessor->setValue('ikm', $ikm);
 
-        $unsurs = Unsur::orderBy('kd_unsur')->get();
+        $unsurs = Unsurikmpembinaan::orderBy('kd_unsur')->get();
         $jumlah_unsur = $unsurs->count();
 
         $templateProcessor->setValue('jumlah_unsur', $jumlah_unsur);
@@ -48,7 +45,7 @@ class ExportLaporanIKMPembinaanController extends Controller
             $templateProcessor->setValue("nama_unsur#{$i}", $unsur->nama_unsur);
         }
 
-        $kelompokPilihan = Pilihan_jawaban::all()
+        $kelompokPilihan = Pilihan_jawabanikmpembinaan::all()
             ->groupBy(fn($item) => strtoupper(trim($item->mutu)))
             ->map(fn($items) => $items->pluck('teks_pilihan')->implode(', '));
 
@@ -63,7 +60,6 @@ class ExportLaporanIKMPembinaanController extends Controller
         }
         $templateProcessor->cloneRowAndSetValues('no', $rows);
         $dataResponden = $this->getDataRespondenFixed($kegiatanNama);
-        //$dataResponden = $this->getDataRespondenFixed($kegiatanNama);
 
         $totals = [];
         $counts = [];
@@ -87,7 +83,6 @@ class ExportLaporanIKMPembinaanController extends Controller
         $dataResponden[] = $avgRow;
 
         $skmRow = ['id_biodata' => 'Nilai SKM perparameter'];
-        // $skmData = $this->getSkmPerParameter($kegiatanNama);
         $skmData = $this->getSkmPerParameter($kegiatanNama)->pluck('skm', 'kd_unsurikmpembinaan');
         for ($i = 1; $i <= $maxUnsur; $i++) {
             $kd = 'P' . $i;
@@ -105,16 +100,16 @@ class ExportLaporanIKMPembinaanController extends Controller
 
     public function getDataRespondenFixed($kegiatanNama)
     {
-        $pertanyaan = Pertanyaan::with('unsur')->get();
+        $pertanyaan = Pertanyaanikmpembinaan::with('unsur')->get();
         $kd_unsur_list = $pertanyaan->pluck('unsur.kd_unsur')->unique()->values();
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->where('respondens.kegiatan', $kegiatanNama)
-            ->selectRaw('respondens.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
+        $query = DB::table('responden_ikm_pembinaans')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
+            ->where('respondenpembinaans.kegiatan', $kegiatanNama)
+            ->selectRaw('respondenpembinaans.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
                 return "MAX(CASE WHEN kd_unsurikmpembinaan = '{$kd}' THEN skor END) AS `{$kd}`";
             })->implode(', '))
-            ->groupBy('respondens.id')
+            ->groupBy('respondenpembinaans.id')
             ->get();
 
         $result = [];
@@ -132,14 +127,14 @@ class ExportLaporanIKMPembinaanController extends Controller
 
     public function getSkmPerParameter($kegiatanNama)
     {
-        $totalParameter = Pertanyaan::count();
+        $totalParameter = Pertanyaanikmpembinaan::count();
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
+        $query = DB::table('responden_ikm_pembinaans')
             ->whereNotNull('kegiatan')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
             ->select('kd_unsurikmpembinaan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"))
-            ->where('respondens.kegiatan', $kegiatanNama)
+            ->where('respondenpembinaans.kegiatan', $kegiatanNama)
             ->groupBy('kd_unsurikmpembinaan')
             ->get();
 
@@ -148,7 +143,7 @@ class ExportLaporanIKMPembinaanController extends Controller
 
     public function getIkm($kegiatanNama)
     {
-        $totalParameter = Pertanyaan::count();
+        $totalParameter = Pertanyaanikmpembinaan::count();
         $totalNp = \App\Models\NilaiPersepsiIkm::count();
 
         if ($totalParameter === 0 || $totalNp === 0) {
@@ -158,12 +153,12 @@ class ExportLaporanIKMPembinaanController extends Controller
         $konversi = 100 / $totalNp;
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.kegiatan');
+        $query = DB::table('responden_ikm_pembinaans')
+            ->join('respondenpembinaans', 'responden_ikm_pembinaans.id_biodata', '=', 'respondenpembinaans.id')
+            ->whereNotNull('respondenpembinaans.kegiatan');
 
         if ($kegiatanNama) {
-            $query->where('respondens.kegiatan', $kegiatanNama);
+            $query->where('respondenpembinaans.kegiatan', $kegiatanNama);
         }
 
         $totalSkor = $query->sum('skor');

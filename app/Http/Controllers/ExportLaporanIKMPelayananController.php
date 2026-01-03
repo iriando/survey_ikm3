@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Responden;
+use App\Models\RespondenPelayanan;
 use Illuminate\Http\Request;
 use App\Models\NilaiPersepsiIkm;
 use Illuminate\Support\Facades\DB;
@@ -16,13 +16,13 @@ class ExportLaporanIKMPelayananController extends Controller
     {
         $tanggalMulai   = $request->input('tanggalMulai');
         $tanggalAkhir   = $request->input('tanggalAkhir');
-        $jenisLayanan   = $request->input('jenisLayanan'); // tambahan
+        $jenisLayanan   = $request->input('jenisLayanan');
 
         $templatePath = storage_path('app/templates/laporan_ikm_pelayanan.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
 
         // Jumlah responden
-        $jumlah_responden = Responden::whereNotNull('j_layanan')
+        $jumlah_responden = RespondenPelayanan::whereNotNull('j_layanan')
             ->whereHas('jawabansurvey')
             ->whereBetween('created_at', [$tanggalMulai, $tanggalAkhir])
             ->when($jenisLayanan, fn ($q) => $q->where('j_layanan', $jenisLayanan))
@@ -109,19 +109,19 @@ class ExportLaporanIKMPelayananController extends Controller
         $pertanyaan = Pertanyaanikmpelayanan::with('unsur')->get();
         $kd_unsur_list = $pertanyaan->pluck('unsur.kd_unsur')->unique()->values();
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan')
-            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir]);
+        $query = DB::table('responden_ikm_Pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+            ->whereNotNull('respondenpelayanans.j_layanan')
+            ->whereBetween('respondenpelayanans.created_at', [$tanggalMulai, $tanggalAkhir]);
 
         if ($jenisLayanan) {
-            $query->where('respondens.j_layanan', $jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $jenisLayanan);
         }
 
-        $query->selectRaw('respondens.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
+        $query->selectRaw('respondenpelayanans.id AS id_biodata, ' . $kd_unsur_list->map(function ($kd) {
             return "MAX(CASE WHEN kd_unsurikmpelayanan = '{$kd}' THEN skor END) AS `{$kd}`";
         })->implode(', '))
-        ->groupBy('respondens.id');
+        ->groupBy('respondenpelayanans.id');
 
         $result = [];
         foreach ($query->get() as $row) {
@@ -140,13 +140,13 @@ class ExportLaporanIKMPelayananController extends Controller
         $totalParameter = Pertanyaanikmpelayanan::count();
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan')
-            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir]);
+        $query = DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+            ->whereNotNull('respondenpelayanans.j_layanan')
+            ->whereBetween('respondenpelayanans.created_at', [$tanggalMulai, $tanggalAkhir]);
 
         if ($jenisLayanan) {
-            $query->where('respondens.j_layanan', $jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $jenisLayanan);
         }
 
         return $query->select('kd_unsurikmpelayanan', DB::raw("FORMAT(SUM(skor) / COUNT(skor) * $bobot, 2) as skm"))
@@ -163,13 +163,13 @@ class ExportLaporanIKMPelayananController extends Controller
         $konversi = 100 / $totalNp;
         $bobot = 1 / $totalParameter;
 
-        $query = DB::table('responden_ikms')
-            ->join('respondens', 'responden_ikms.id_biodata', '=', 'respondens.id')
-            ->whereNotNull('respondens.j_layanan')
-            ->whereBetween('respondens.created_at', [$tanggalMulai, $tanggalAkhir]);
+        $query = DB::table('responden_ikm_pelayanans')
+            ->join('respondenpelayanans', 'responden_ikm_pelayanans.id_biodata', '=', 'respondenpelayanans.id')
+            ->whereNotNull('respondenpelayanans.j_layanan')
+            ->whereBetween('respondenpelayanans.created_at', [$tanggalMulai, $tanggalAkhir]);
 
         if ($jenisLayanan) {
-            $query->where('respondens.j_layanan', $jenisLayanan);
+            $query->where('respondenpelayanans.j_layanan', $jenisLayanan);
         }
 
         $totalSkor = $query->sum('skor');

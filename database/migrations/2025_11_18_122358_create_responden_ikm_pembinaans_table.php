@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_biodata');
             $table->string('kd_unsurikmpembinaan')->nullable();
-            $table->integer('skor');
+            $table->decimal('skor', 5, 2);
             $table->timestamps();
 
             $table->foreignId('narasumber_id')->nullable()->constrained('narasumbers')->onDelete('set null');
